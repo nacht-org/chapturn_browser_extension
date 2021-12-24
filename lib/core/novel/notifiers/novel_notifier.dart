@@ -1,16 +1,31 @@
-import 'package:chapturn_browser_extension/core/alert/notifiers/alert_notifier.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_notifier.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/volume_notifier.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+
+import '../../alert/notifiers/alert_notifier.dart';
+import 'chapter_notifier.dart';
+import 'volume_notifier.dart';
 
 enum NovelNotifierState {
   loading,
   idle,
   downloading,
   notSupported,
+}
+
+class PackagingState extends Equatable {
+  final String message;
+  final bool error;
+
+  PackagingState(this.message, this.error);
+  PackagingState.idle() : this('Idle', false);
+  PackagingState.waiting() : this('Waiting', false);
+  PackagingState.busy() : this('Busy', false);
+
+  @override
+  List<Object?> get props => [message, error];
 }
 
 class NovelNotifier extends ChangeNotifier {
@@ -25,6 +40,8 @@ class NovelNotifier extends ChangeNotifier {
   int total = 0;
   List<VolumeNotifier> volumes = [];
   bool isDownloading = false;
+
+  PackagingState packagingState = PackagingState.idle();
 
   AlertNotifier alert;
 
@@ -66,9 +83,9 @@ class NovelNotifier extends ChangeNotifier {
     }
   }
 
-  List<ChapterNotifier> get pendingDownload {
+  List<ChapterNotifier> pendingDownload() {
     return [
-      for (var chapters in volumes.map((e) => e.pendingDownload)) ...chapters
+      for (var chapters in volumes.map((e) => e.pendingDownload())) ...chapters
     ];
   }
 
@@ -107,17 +124,17 @@ class NovelNotifier extends ChangeNotifier {
 
   /// Download all chapter content if not already done so
   Future<void> waitDownload() async {
-    if (isDownloaded) {
-      return;
-    }
-
     if (_crawler == null) {
       print('Download called when crawler was null');
       return;
     }
 
     isDownloading = true;
-    var pending = pendingDownload;
+    var pending = pendingDownload();
+    if (pending.isEmpty) {
+      isDownloading = false;
+      return;
+    }
 
     value = 1;
     total = pending.length;
@@ -139,6 +156,17 @@ class NovelNotifier extends ChangeNotifier {
   }
 
   Future<void> packEpub() async {
-    alert.showAlert('Packing epub');
+    packagingState = PackagingState.waiting();
+
+    if (isDownloading) {
+      alert.showAlert('Another task already running');
+      packagingState = PackagingState.idle();
+      return;
+    }
+
+    await waitDownload();
+    packagingState = PackagingState.busy();
+    // package
+    packagingState = PackagingState.idle();
   }
 }

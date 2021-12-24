@@ -86,11 +86,8 @@ class EpubWriter {
   }
 
   void _writeOpfMetaData(XmlBuilder root) {
-    final nsmap = {
-      'dc': namespaces['DC']!,
-      'OPF': namespaces['OPF']!,
-      ...book.namespaces,
-    };
+    final nsmap = {'dc': namespaces['DC']!, 'opf': namespaces['OPF']!};
+    nsmap.addAll(namespaces);
 
     root.element('metadata', nest: () {
       nsmap.forEach(root.attribute);
@@ -124,7 +121,10 @@ class EpubWriter {
         } else {
           // DC and others
           for (var nameEntry in entry.value.entries) {
-            final name = ns == null ? nameEntry.key : '{$ns}${nameEntry.key}';
+            final name = ns == null
+                ? nameEntry.key
+                : '${ns.toLowerCase()}:${nameEntry.key}';
+
             for (var v in nameEntry.value) {
               root.element(name, nest: () {
                 v.item2.forEach(root.attribute);
@@ -187,8 +187,8 @@ class EpubWriter {
   void _writeOpfSpine(XmlBuilder root, String? ncxId) {
     root.element('spine', nest: () {
       root.attribute('toc', ncxId ?? 'ncx');
-      if (options.spineDirection) {
-        root.attribute('page-progression-direction', book.direction);
+      if (book.direction != null && options.spineDirection) {
+        root.attribute('page-progression-direction', book.direction!.name);
       }
 
       var isLinear = true;
@@ -240,11 +240,12 @@ class EpubWriter {
       'version': '3.0'
     };
 
-    if (options.packageDirection) {
-      packageAttributes['dir'] = book.direction.value;
+    if (book.direction != null && options.packageDirection) {
+      packageAttributes['dir'] = book.direction!.name;
     }
 
     final root = XmlBuilder();
+    root.declaration(encoding: 'utf-8');
     root.element('package', nest: () {
       packageAttributes.forEach(root.attribute);
 
@@ -440,12 +441,14 @@ class EpubWriter {
       } else if (item is EpubNav) {
         archive.addFile(_getNav(item).inPath(filename));
       } else if (item.manifest) {
+        final content = item.html;
         archive.addFile(
-          ArchiveFile(filename, item.content.length, item.content),
+          ArchiveFile(filename, content.length, content),
         );
       } else {
+        final content = item.html;
         archive.addFile(
-          ArchiveFile(item.filename, item.content.length, item.content),
+          ArchiveFile(item.filename, content.length, content),
         );
       }
     }

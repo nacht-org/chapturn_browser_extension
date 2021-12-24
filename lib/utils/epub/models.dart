@@ -1,10 +1,13 @@
-import 'package:chapturn_browser_extension/utils/epub/constants.dart';
+import 'dart:convert' as convert;
+
 import 'package:chapturn_sources/models/metadata.dart';
-import 'package:path/path.dart' as path;
 import 'package:html/parser.dart' as parser;
-import 'package:tuple/tuple.dart';
 import 'package:mime/mime.dart' as mime;
+import 'package:path/path.dart' as path;
+import 'package:tuple/tuple.dart';
 import 'package:xml/xml.dart';
+
+import 'constants.dart';
 
 // Navigation items
 
@@ -76,11 +79,6 @@ enum EpubDirection {
   rtl,
   lro,
   rlo,
-  def,
-}
-
-extension Value on EpubDirection {
-  String get value => this == EpubDirection.def ? 'default' : name;
 }
 
 const extensions = {
@@ -129,6 +127,10 @@ class EpubItem {
     }
 
     return ItemType.unknown;
+  }
+
+  List<int> get html {
+    return content;
   }
 }
 
@@ -219,12 +221,13 @@ class EpubHtml extends EpubItem {
     return bodyElement.innerHtml;
   }
 
-  String get html {
-    final xmlTree = XmlDocument.parse(chapterXml);
+  List<int> get html {
+    final tree = XmlDocument.parse(chapterXml);
+    final root = tree.rootElement;
 
     // set language
-    xmlTree.setAttribute('lang', lang ?? book.lang);
-    xmlTree.setAttribute('{${namespaces["XML"]}}lang', lang ?? book.lang);
+    root.setAttribute('lang', lang ?? book.lang);
+    root.setAttribute('{${namespaces["XML"]}}lang', lang ?? book.lang);
 
     final head = XmlBuilder();
     head.element('head', nest: () {
@@ -255,9 +258,11 @@ class EpubHtml extends EpubItem {
     final body = XmlBuilder();
 
     // direction
-    xmlTree.setAttribute('dir', direction?.value ?? book.direction.value);
     body.element('body', nest: () {
-      body.attribute('dir', direction?.value ?? book.direction.value);
+      if (direction != null || book.direction != null) {
+        root.setAttribute('dir', direction?.name ?? book.direction!.name);
+        body.attribute('dir', direction?.name ?? book.direction!.name);
+      }
 
       final htmlTree = parser.parse(content);
       final bodyHtml = htmlTree.body;
@@ -267,11 +272,11 @@ class EpubHtml extends EpubItem {
     });
 
     // add head and body
-    xmlTree.children
+    root.children
       ..add(head.buildFragment())
       ..add(body.buildFragment());
 
-    return xmlTree.toXmlString(pretty: true);
+    return convert.utf8.encode(root.toXmlString(pretty: true));
   }
 }
 
@@ -314,7 +319,7 @@ class EpubBook {
   String uid;
   String title;
   String lang;
-  EpubDirection direction;
+  EpubDirection? direction;
 
   Map<String?, Map<String, List<Tuple2<String, Map<String, String>>>>>
       metadata = {};
@@ -340,7 +345,7 @@ class EpubBook {
     required this.uid,
     required this.title,
     this.lang = 'en',
-    this.direction = EpubDirection.def,
+    this.direction,
   }) {
     setMetaData(
       namespace: Namespace.DC,

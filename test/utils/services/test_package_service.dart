@@ -23,7 +23,7 @@ void main() {
       final novel = await crawler.parseNovel(url);
 
       var data = await EpubPackager().package(novel);
-      await File('test/test.epub').writeAsBytes(data!);
+      await File('~/Desktop/test.epub').writeAsBytes(data!);
     });
   });
 }

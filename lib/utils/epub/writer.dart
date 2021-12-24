@@ -310,9 +310,9 @@ class EpubWriter {
     int uid, {
     bool fragment = false,
   }) {
-    final builder = XmlBuilder();
-
     for (var item in items) {
+      final builder = XmlBuilder();
+      var childNode;
       if (item is Section) {
         builder.element('navPoint', nest: () {
           builder.attribute('id', 'sep_$uid');
@@ -325,24 +325,28 @@ class EpubWriter {
           });
 
           builder.element('content', attributes: {'src': item.href});
-          uid = _createSection(node, item.items, uid + 1, fragment: true);
+
+          childNode = builder.buildFragment();
+          uid = _createSection(childNode, item.items, uid + 1, fragment: true);
         });
       } else if (item is Flat) {
         for (var chapter in item.items) {
           _createLink(node, builder, Link.html(chapter));
         }
       } else if (item is Link) {
-        _createLink(node, builder, item as Link);
+        _createLink(node, builder, item);
       }
-    }
 
-    node.children.add(builder.buildFragment());
+      childNode ??= builder.buildFragment();
+      node.children.add(childNode);
+    }
 
     return uid;
   }
 
   String _getNcx() {
-    final root = XmlDocument.parse(ncxXml);
+    final tree = XmlDocument.parse(ncxXml);
+    final root = tree.rootElement;
 
     // head
     final head = XmlBuilder();
@@ -367,17 +371,19 @@ class EpubWriter {
     root.children.add(docTitle.buildFragment());
 
     // navMap
-    final builder = XmlBuilder()..element('navMap');
+    final builder = XmlBuilder();
+    builder.element('navMap');
+
     final navMap = builder.buildFragment();
-    _createSection(navMap, book.toc, 0);
+    _createSection(navMap.firstChild!, book.toc, 0);
     root.children.add(navMap);
 
     return root.toXmlString(pretty: true);
   }
 
   String _getNav(EpubHtml item) {
-    final _root = XmlDocument.parse(navXml);
-    final root = _root.getElement('html')!;
+    final tree = XmlDocument.parse(navXml);
+    final root = tree.rootElement;
     root.setAttribute('lang', book.lang);
     root.setAttribute('{${namespaces["XML"]}}lang', book.lang);
 

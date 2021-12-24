@@ -26,12 +26,13 @@ class NovelCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   child: notifier.novel?.thumbnailUrl == null
                       ? Image.asset(
-                          'assets/images/abstract.jpg',
-                          fit: BoxFit.fill,
+                          'assets/images/book-thumbnail.png',
+                          fit: BoxFit.cover,
+                          semanticLabel: 'Novel thumbnail placeholder',
                         )
                       : Image.network(
                           notifier.novel!.thumbnailUrl!,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                 ),
               ),
@@ -55,7 +56,12 @@ class NovelCard extends StatelessWidget {
                       Text(
                           '${novel.status ?? "Unknown"} • ${notifier.chaptersLength} chapters'),
                       const SizedBox(height: 8.0),
-                      Text(novel.lang),
+                      Chip(
+                        label: Text(novel.lang),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       const Spacer(),
                     ],
                   ),

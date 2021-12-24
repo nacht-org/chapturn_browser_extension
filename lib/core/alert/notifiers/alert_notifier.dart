@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 class Alert {
   final String message;
+
   Alert(this.message);
 }
 

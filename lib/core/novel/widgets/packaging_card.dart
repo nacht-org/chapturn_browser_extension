@@ -22,11 +22,16 @@ class PackagingCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headline6),
           ),
           buildDownloadTile(notifier),
-          Divider(),
-          ListTile(
-            title: Text('Package to Epub'),
-            leading: Icon(Icons.book),
-            onTap: notifier.packEpub,
+          Selector<NovelNotifier, PackagingState>(
+            selector: (context, notifier) => notifier.packagingState,
+            builder: (context, state, child) {
+              return ListTile(
+                title: const Text('Package'),
+                subtitle: Text(state.message),
+                leading: const Icon(Icons.book),
+                onTap: notifier.packEpub,
+              );
+            },
           ),
           const SizedBox(height: 12),
         ],

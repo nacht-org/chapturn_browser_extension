@@ -12,13 +12,9 @@ class VolumeNotifier extends ChangeNotifier {
   }
 
   /// All selected chapters have content
-  bool get isDownloaded {
-    return chapters.every(
-      (element) => !element.selected || element.chapter.content != null,
-    );
-  }
+  bool get isDownloaded => pendingDownload().isEmpty;
 
-  List<ChapterNotifier> get pendingDownload {
+  List<ChapterNotifier> pendingDownload() {
     return chapters.where((element) => element.shouldDownload).toList();
   }
 }

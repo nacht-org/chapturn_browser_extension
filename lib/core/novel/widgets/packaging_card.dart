@@ -26,6 +26,7 @@ class PackagingCard extends StatelessWidget {
           ListTile(
             title: Text('Package to Epub'),
             leading: Icon(Icons.book),
+            onTap: notifier.packEpub,
           ),
           const SizedBox(height: 12),
         ],

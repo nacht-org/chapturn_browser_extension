@@ -58,11 +58,11 @@ class _NovelPageState extends State<NovelPage> {
               flex: 7,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+                children: const [
                   NovelCard(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   PackagingCard(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   ChaptersCard()
                 ],
               ),

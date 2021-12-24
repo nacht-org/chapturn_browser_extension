@@ -1,3 +1,4 @@
+import 'package:chapturn_browser_extension/core/alert/notifiers/alert_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/notifiers/volume_notifier.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
@@ -25,7 +26,9 @@ class NovelNotifier extends ChangeNotifier {
   List<VolumeNotifier> volumes = [];
   bool isDownloading = false;
 
-  NovelNotifier(this.url) {
+  AlertNotifier alert;
+
+  NovelNotifier(this.url, this.alert) {
     var tuple = crawlerByUrl(url);
     if (tuple == null) {
       return;
@@ -133,5 +136,9 @@ class NovelNotifier extends ChangeNotifier {
 
     isDownloading = false;
     notifyListeners();
+  }
+
+  Future<void> packEpub() async {
+    alert.showAlert('Packing epub');
   }
 }

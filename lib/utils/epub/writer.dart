@@ -322,6 +322,7 @@ class EpubWriter {
 
           builder.element('content', attributes: {'src': item.href});
         });
+
         childNode = builder.buildFragment();
         uid = _createSection(childNode.firstChild!, item.items, uid + 1);
       } else if (item is Flat) {

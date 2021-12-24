@@ -22,7 +22,33 @@ class EpubPackager implements Packager {
       title: novel.title,
     );
 
+    // description
     book.addAuthor(novel.author ?? 'author');
+    if (novel.description.isNotEmpty) {
+      book.addMetaData(
+        namespace: Namespace.DC,
+        name: 'description',
+        value: novel.description.join('\n'),
+      );
+    }
+
+    if (novel.status != null) {
+      book.addMetaData(
+        namespace: Namespace.OPF,
+        name: 'status',
+        value: novel.status!,
+      );
+    }
+
+    // all metadata
+    for (var m in novel.metadata) {
+      book.addMetaData(
+        namespace: m.namespace,
+        name: m.name,
+        value: m.value,
+        others: m.others,
+      );
+    }
 
     final chapterMap = <Volume, List<EpubHtml>>{};
     for (var volume in novel.volumes) {

@@ -305,15 +305,10 @@ class EpubWriter {
     });
   }
 
-  int _createSection(
-    XmlNode node,
-    List<NavItem> items,
-    int uid, {
-    bool fragment = false,
-  }) {
+  int _createSection(XmlNode node, List<NavItem> items, int uid) {
     for (var item in items) {
       final builder = XmlBuilder();
-      var childNode;
+      XmlDocumentFragment? childNode;
       if (item is Section) {
         builder.element('navPoint', nest: () {
           builder.attribute('id', 'sep_$uid');
@@ -326,10 +321,9 @@ class EpubWriter {
           });
 
           builder.element('content', attributes: {'src': item.href});
-
-          childNode = builder.buildFragment();
-          uid = _createSection(childNode, item.items, uid + 1, fragment: true);
         });
+        childNode = builder.buildFragment();
+        uid = _createSection(childNode.firstChild!, item.items, uid + 1);
       } else if (item is Flat) {
         for (var chapter in item.items) {
           _createLink(node, builder, Link.html(chapter));

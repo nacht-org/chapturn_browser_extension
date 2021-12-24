@@ -21,9 +21,13 @@ void main() {
       final crawler = tuple.item2();
 
       final novel = await crawler.parseNovel(url);
+      novel.volumes.add(Volume(
+          index: 1,
+          name: 'Another',
+          chapters: [Chapter(index: 70, title: 'Ho ho', url: 'https')]));
 
       var data = await EpubPackager().package(novel);
-      await File('~/Desktop/test.epub').writeAsBytes(data!);
+      await File('c:/Users/User/Desktop/test.epub').writeAsBytes(data!);
     });
   });
 }

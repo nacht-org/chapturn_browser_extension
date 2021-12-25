@@ -1,6 +1,7 @@
 import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
 import 'package:chapturn_browser_extension/utils/helpers/web_helper.dart';
 import 'package:chapturn_browser_extension/utils/services/package_service.dart';
+import 'package:chapturn_browser_extension/utils/services/web_service.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
@@ -33,9 +34,16 @@ class PackagingState extends Equatable {
   List<Object?> get props => [message, error];
 }
 
-class NovelModel extends ChangeNotifier {
-  String url;
+class ContentIndex {
+  final int volumeIndex;
+  final int? chapterIndex;
 
+  const ContentIndex(this.volumeIndex, [this.chapterIndex]);
+
+  bool get isChapter => chapterIndex != null;
+}
+
+class NovelModel extends ChangeNotifier {
   Meta? meta;
   NovelCrawler? _crawler;
   bool isLoading = true;
@@ -45,6 +53,7 @@ class NovelModel extends ChangeNotifier {
   int value = 0;
   int total = 0;
   Map<int, VolumeModel> volumes = {};
+  List<ContentIndex> flat = [];
 
   bool isDownloading = false;
 
@@ -52,9 +61,14 @@ class NovelModel extends ChangeNotifier {
 
   final AlertModel alert;
   final Packager packager;
+  final WebService webService;
 
-  NovelModel(this.url, this.alert, {required this.packager}) {
-    var tuple = crawlerByUrl(url);
+  NovelModel({
+    required this.alert,
+    required this.packager,
+    required this.webService,
+  }) {
+    var tuple = crawlerByUrl(webService.novelUrl);
     if (tuple == null) {
       return;
     }
@@ -62,6 +76,8 @@ class NovelModel extends ChangeNotifier {
     meta = tuple.item1();
     _crawler = tuple.item2();
   }
+
+  String get url => webService.novelUrl;
 
   /// Novel is null
   bool get hasData => novel != null;
@@ -116,11 +132,28 @@ class NovelModel extends ChangeNotifier {
     }
 
     novel = await _crawler!.parseNovel(url);
+    novel!.volumes.add(Volume(
+      index: 1,
+      name: 'Debug',
+      chapters: [
+        Chapter(
+            index: 200,
+            title: "Isekai",
+            url: novel!.volumes.first.chapters.first.url),
+      ],
+    ));
 
     if (novel != null) {
-      volumes = Map.fromEntries(
-        novel!.volumes.map((v) => MapEntry(v.index, VolumeModel(v))),
-      );
+      final entries = <MapEntry<int, VolumeModel>>[];
+      for (var volume in novel!.volumes) {
+        entries.add(MapEntry(volume.index, VolumeModel(volume)));
+        flat.add(ContentIndex(volume.index));
+        flat.addAll(volume.chapters.map(
+          (chapter) => ContentIndex(volume.index, chapter.index),
+        ));
+      }
+
+      volumes = Map.fromEntries(entries);
     }
 
     isLoading = false;

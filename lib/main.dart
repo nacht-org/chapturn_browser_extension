@@ -3,15 +3,15 @@ import 'package:chapturn_browser_extension/core/alert/widgets/alert_listener.dar
 import 'package:chapturn_browser_extension/core/novel/models/novel_model.dart';
 import 'package:chapturn_browser_extension/utils/injection.dart';
 import 'package:chapturn_browser_extension/utils/services/package_service.dart';
+import 'package:chapturn_browser_extension/utils/services/web_service.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';
 
 import 'core/novel/pages/novel_page.dart';
 
 void main() {
-  configureInjection();
+  configureInjection(Environment.dev);
   runApp(const MyApp());
 }
 
@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(
             create: (context) => NovelModel(
-              'https://www.scribblehub.com/series/412447/shonen-hero-system/',
-              context.read<AlertModel>(),
+              alert: context.read<AlertModel>(),
               packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
+              webService: getIt.get<WebService>(),
             ),
           ),
         ],

@@ -45,35 +45,36 @@ class MultiVolumeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: model.volumes.length,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20.0, right: 20, bottom: 20),
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TabBar(
-                isScrollable: true,
-                labelColor: Theme.of(context).colorScheme.onSurface,
-                tabs: model.volumes.values
-                    .map((volume) => Tab(text: volume.volume.name))
-                    .toList(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            LimitedBox(
-              maxHeight: MediaQuery.of(context).size.height,
-              child: TabBarView(
-                children: model.volumes.values
-                    .map((v) => ChapterList(model, v.chapters.values.toList()))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
+    Widget child = ListView.builder(
+      itemCount: model.flat.length,
+      itemBuilder: (context, i) {
+        final index = model.flat[i];
+        final volume = model.volumes[index.volumeIndex]!;
+
+        if (index.isChapter) {
+          final chapter = volume.chapters[index.chapterIndex]!;
+
+          return ChangeNotifierProvider.value(
+            value: chapter,
+            child: ChapterTile(model),
+          );
+        } else {
+          return ListTile(
+            title: Text(volume.volume.name),
+          );
+        }
+      },
+      shrinkWrap: true,
     );
+
+    if (model.chapterCount > 40) {
+      child = LimitedBox(
+        maxHeight: MediaQuery.of(context).size.height,
+        child: child,
+      );
+    }
+
+    return child;
   }
 }
 
@@ -94,7 +95,7 @@ class ChapterList extends StatelessWidget {
       shrinkWrap: true,
     );
 
-    if (chapters.length > 10) {
+    if (chapters.length > 40) {
       child = LimitedBox(
         maxHeight: MediaQuery.of(context).size.height,
         child: child,

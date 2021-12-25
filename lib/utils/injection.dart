@@ -5,9 +5,5 @@ import 'injection.config.dart';
 final getIt = GetIt.instance;
 
 @injectableInit
-void configureInjection() => $initGetIt(getIt);
-
-abstract class Env {
-  static const dev = 'dev';
-  static const prod = 'prod';
-}
+void configureInjection(String environment) =>
+    $initGetIt(getIt, environment: environment);

@@ -1,7 +1,8 @@
-import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../notifiers/novel_notifier.dart';
+
+import '../notifiers/chapter_model.dart';
+import '../notifiers/novel_model.dart';
 
 class ChaptersCard extends StatelessWidget {
   const ChaptersCard({
@@ -10,7 +11,7 @@ class ChaptersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var notifier = context.watch<NovelNotifier>();
+    var model = context.watch<NovelModel>();
 
     return Card(
       child: Column(
@@ -19,15 +20,15 @@ class ChaptersCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Text(
-              '${notifier.chaptersLength} chapters',
+              '${model.chapterCount} chapters',
               style: Theme.of(context).textTheme.headline6,
             ),
           ),
-          if (notifier.volumes.isNotEmpty)
-            for (var ci in notifier.volumes[0].chapters)
+          if (model.volumes.isNotEmpty)
+            for (var ci in model.volumes[0].chapters)
               ChangeNotifierProvider.value(
                 value: ci,
-                child: ChapterTile(),
+                child: ChapterTile(model),
               ),
           const SizedBox(height: 12),
         ],
@@ -37,19 +38,20 @@ class ChaptersCard extends StatelessWidget {
 }
 
 class ChapterTile extends StatelessWidget {
-  const ChapterTile({Key? key}) : super(key: key);
+  const ChapterTile(this.novelModel, {Key? key}) : super(key: key);
+
+  final NovelModel novelModel;
 
   @override
   Widget build(BuildContext context) {
-    var ci = context.watch<ChapterNotifier>();
-    var notifier = context.watch<NovelNotifier>();
+    var model = context.watch<ChapterNotifier>();
 
     return CheckboxListTile(
-      title: Text(ci.chapter.title),
-      subtitle: Text(ci.chapter.updated?.toString() ?? ''),
-      secondary: Icon(tileIcon(ci.tileState)),
-      value: ci.selected,
-      onChanged: notifier.isDownloading ? null : ci.select,
+      title: Text(model.chapter.title),
+      subtitle: Text(model.chapter.updated?.toString() ?? '<unknown>'),
+      secondary: Icon(tileIcon(model.tileState)),
+      value: model.selected,
+      onChanged: novelModel.isDownloading ? null : model.select,
     );
   }
 

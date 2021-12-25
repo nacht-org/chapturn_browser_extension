@@ -1,6 +1,7 @@
-import 'package:chapturn_browser_extension/core/alert/notifiers/alert_notifier.dart';
+import 'package:chapturn_browser_extension/core/alert/notifiers/alert_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class AlertListener extends StatelessWidget {
   const AlertListener({Key? key, required this.child}) : super(key: key);
@@ -9,7 +10,7 @@ class AlertListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<AlertNotifier, Alert?>(
+    return Selector<AlertModel, Alert?>(
       builder: (context, value, child) {
         if (value != null) {
           WidgetsBinding.instance?.addPostFrameCallback((_) {
@@ -31,7 +32,7 @@ class AlertListener extends StatelessWidget {
         SnackBar(
           content: Text(alert.message),
           behavior: SnackBarBehavior.floating,
-          width: 400,
+          width: math.min(MediaQuery.of(context).size.width, 400),
         ),
       );
   }

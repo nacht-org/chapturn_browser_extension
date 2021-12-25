@@ -4,11 +4,11 @@ import 'package:chapturn_sources/models/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../alert/notifiers/alert_notifier.dart';
-import 'chapter_notifier.dart';
-import 'volume_notifier.dart';
+import '../../alert/notifiers/alert_model.dart';
+import 'chapter_model.dart';
+import 'volume_model.dart';
 
-enum NovelNotifierState {
+enum NovelModelState {
   loading,
   idle,
   downloading,
@@ -19,16 +19,16 @@ class PackagingState extends Equatable {
   final String message;
   final bool error;
 
-  PackagingState(this.message, this.error);
-  PackagingState.idle() : this('Idle', false);
-  PackagingState.waiting() : this('Waiting', false);
-  PackagingState.busy() : this('Busy', false);
+  const PackagingState(this.message, this.error);
+  const PackagingState.idle() : this('Idle', false);
+  const PackagingState.waiting() : this('Waiting', false);
+  const PackagingState.busy() : this('Busy', false);
 
   @override
   List<Object?> get props => [message, error];
 }
 
-class NovelNotifier extends ChangeNotifier {
+class NovelModel extends ChangeNotifier {
   Meta? meta;
   NovelCrawler? _crawler;
   bool isLoading = true;
@@ -41,11 +41,11 @@ class NovelNotifier extends ChangeNotifier {
   List<VolumeNotifier> volumes = [];
   bool isDownloading = false;
 
-  PackagingState packagingState = PackagingState.idle();
+  PackagingState packagingState = const PackagingState.idle();
 
-  AlertNotifier alert;
+  AlertModel alert;
 
-  NovelNotifier(this.url, this.alert) {
+  NovelModel(this.url, this.alert) {
     var tuple = crawlerByUrl(url);
     if (tuple == null) {
       return;
@@ -56,9 +56,7 @@ class NovelNotifier extends ChangeNotifier {
   }
 
   /// Novel is null
-  bool get hasData {
-    return novel != null;
-  }
+  bool get hasData => novel != null;
 
   /// Has a source and the source supports browser
   bool get isSupported {
@@ -71,15 +69,15 @@ class NovelNotifier extends ChangeNotifier {
     return novel != null && volumes.every((v) => v.isDownloaded);
   }
 
-  NovelNotifierState get state {
+  NovelModelState get state {
     if (isLoading) {
-      return NovelNotifierState.loading;
+      return NovelModelState.loading;
     } else if (isDownloading) {
-      return NovelNotifierState.downloading;
+      return NovelModelState.downloading;
     } else if (!isSupported) {
-      return NovelNotifierState.notSupported;
+      return NovelModelState.notSupported;
     } else {
-      return NovelNotifierState.idle;
+      return NovelModelState.idle;
     }
   }
 
@@ -89,14 +87,12 @@ class NovelNotifier extends ChangeNotifier {
     ];
   }
 
-  int get chaptersLength {
-    if (volumes.isEmpty) {
+  int get chapterCount {
+    if (novel == null) {
       return 0;
     }
 
-    return volumes
-        .map((e) => e.chapters.length)
-        .reduce((value, element) => value + element);
+    return novel!.chapterCount();
   }
 
   /// Retrieve novel information

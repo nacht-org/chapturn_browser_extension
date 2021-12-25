@@ -1,7 +1,7 @@
 import 'package:chapturn_sources/models/volume.dart';
 import 'package:flutter/foundation.dart';
 
-import 'chapter_notifier.dart';
+import 'chapter_model.dart';
 
 class VolumeNotifier extends ChangeNotifier {
   Volume volume;

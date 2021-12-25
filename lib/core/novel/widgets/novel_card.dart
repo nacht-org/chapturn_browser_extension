@@ -1,7 +1,8 @@
+import 'package:chapturn_sources/models/novel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/novel_notifier.dart';
+import '../notifiers/novel_model.dart';
 
 class NovelCard extends StatelessWidget {
   const NovelCard({
@@ -10,8 +11,7 @@ class NovelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var notifier = context.watch<NovelNotifier>();
-    var novel = notifier.novel!;
+    var novel = context.select<NovelModel, Novel?>((model) => model.novel)!;
 
     return SizedBox(
       height: 340,
@@ -24,14 +24,14 @@ class NovelCard extends StatelessWidget {
                 aspectRatio: 2 / 3,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: notifier.novel?.thumbnailUrl == null
+                  child: novel.thumbnailUrl == null
                       ? Image.asset(
                           'assets/images/book-thumbnail.png',
                           fit: BoxFit.cover,
                           semanticLabel: 'Novel thumbnail placeholder',
                         )
                       : Image.network(
-                          notifier.novel!.thumbnailUrl!,
+                          novel.thumbnailUrl!,
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -44,7 +44,7 @@ class NovelCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        notifier.novel!.title,
+                        novel.title,
                         style: Theme.of(context).textTheme.headline5,
                       ),
                       const SizedBox(height: 12.0),
@@ -54,7 +54,7 @@ class NovelCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                          '${novel.status ?? "Unknown"} • ${notifier.chaptersLength} chapters'),
+                          '${novel.status ?? "Unknown"} • ${novel.chapterCount()} chapters'),
                       const SizedBox(height: 8.0),
                       Chip(
                         label: Text(novel.lang),

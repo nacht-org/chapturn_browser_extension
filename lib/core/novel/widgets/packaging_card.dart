@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/novel_notifier.dart';
+import '../notifiers/novel_model.dart';
 
 class PackagingCard extends StatelessWidget {
   const PackagingCard({
@@ -10,7 +10,7 @@ class PackagingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var notifier = context.watch<NovelNotifier>();
+    var notifier = context.watch<NovelModel>();
 
     return Card(
       child: Column(
@@ -22,7 +22,7 @@ class PackagingCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headline6),
           ),
           buildDownloadTile(notifier),
-          Selector<NovelNotifier, PackagingState>(
+          Selector<NovelModel, PackagingState>(
             selector: (context, notifier) => notifier.packagingState,
             builder: (context, state, child) {
               return ListTile(
@@ -39,16 +39,16 @@ class PackagingCard extends StatelessWidget {
     );
   }
 
-  Widget buildDownloadTile(NovelNotifier notifier) {
+  Widget buildDownloadTile(NovelModel notifier) {
     Icon? icon;
     String status;
     switch (notifier.state) {
-      case NovelNotifierState.loading:
-      case NovelNotifierState.notSupported:
-      case NovelNotifierState.idle:
+      case NovelModelState.loading:
+      case NovelModelState.notSupported:
+      case NovelModelState.idle:
         status = 'Idle';
         break;
-      case NovelNotifierState.downloading:
+      case NovelModelState.downloading:
         status = 'In progress: ${notifier.value} of ${notifier.total}';
         icon = Icon(Icons.downloading);
         break;

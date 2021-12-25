@@ -1,6 +1,6 @@
-import 'package:chapturn_browser_extension/core/alert/notifiers/alert_notifier.dart';
+import 'package:chapturn_browser_extension/core/alert/notifiers/alert_model.dart';
 import 'package:chapturn_browser_extension/core/alert/widgets/alert_listener.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/novel_notifier.dart';
+import 'package:chapturn_browser_extension/core/novel/notifiers/novel_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,13 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => AlertNotifier(),
+      create: (context) => AlertModel(),
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(
-            create: (context) => NovelNotifier(
-              'https://www.scribblehub.com/series/180910/the-immortal-witchs-death-wish/',
-              context.read<AlertNotifier>(),
+            create: (context) => NovelModel(
+              'https://www.scribblehub.com/series/412369/new-perspectives/',
+              context.read<AlertModel>(),
             ),
           ),
         ],

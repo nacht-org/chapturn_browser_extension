@@ -1,6 +1,8 @@
-import 'package:chapturn_browser_extension/core/novel/notifiers/novel_notifier.dart';
+import 'package:chapturn_browser_extension/core/novel/notifiers/novel_model.dart';
+import 'package:chapturn_sources/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 import '../widgets/about_novel_card.dart';
 import '../widgets/chapters_card.dart';
@@ -20,24 +22,31 @@ class _NovelPageState extends State<NovelPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NovelNotifier>().loadNovelChecked();
+    context.read<NovelModel>().loadNovelChecked();
   }
 
   @override
   Widget build(BuildContext context) {
-    var state = context.select<NovelNotifier, NovelNotifierState>(
-        (notifier) => notifier.state);
-    print(state);
+    var tuple = context.select<NovelModel, Tuple2<NovelModelState, String>>(
+      (model) => Tuple2(model.state, model.url),
+    );
+    print(tuple);
 
-    switch (state) {
-      case NovelNotifierState.idle:
-      case NovelNotifierState.downloading:
+    switch (tuple.item1) {
+      case NovelModelState.idle:
+      case NovelModelState.downloading:
         return idleView(context);
-      case NovelNotifierState.loading:
-        return const Center(
-          child: CircularProgressIndicator(),
+      case NovelModelState.loading:
+        return Center(
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text(tuple.item2, style: Theme.of(context).textTheme.caption),
+            ],
+          ),
         );
-      case NovelNotifierState.notSupported:
+      case NovelModelState.notSupported:
         return const Center(
           child: Text('Not supported'),
         );
@@ -48,7 +57,7 @@ class _NovelPageState extends State<NovelPage> {
     return ListView(
       padding: EdgeInsets.symmetric(
         vertical: 24.0,
-        horizontal: MediaQuery.of(context).size.width * 0.06,
+        horizontal: listViewPadding(context),
       ),
       children: [
         Row(
@@ -72,7 +81,7 @@ class _NovelPageState extends State<NovelPage> {
               flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+                children: const [
                   AboutNovelCard(),
                 ],
               ),
@@ -81,5 +90,10 @@ class _NovelPageState extends State<NovelPage> {
         )
       ],
     );
+  }
+
+  double listViewPadding(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width < 500 ? 0 : width * 0.06;
   }
 }

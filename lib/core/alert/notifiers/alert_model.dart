@@ -6,7 +6,7 @@ class Alert {
   Alert(this.message);
 }
 
-class AlertNotifier extends ChangeNotifier {
+class AlertModel extends ChangeNotifier {
   Alert? alert;
 
   void showAlert(String message) {

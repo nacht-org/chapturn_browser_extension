@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 
 import 'package:chapturn_sources/models/models.dart';
 import 'package:injectable/injectable.dart';
+import 'package:path/path.dart' as path;
 
 import '../epub/models.dart';
 import '../epub/writer.dart';
@@ -23,6 +24,13 @@ class EpubPackager implements Packager {
       uid: 'test',
       title: novel.title,
     );
+
+    if (novel.thumbnailUrl != null && thumbnailBytes != null) {
+      book.setCover(
+        'cover' + path.extension(novel.thumbnailUrl!),
+        thumbnailBytes,
+      );
+    }
 
     // description
     book.addAuthor(novel.author ?? 'author');

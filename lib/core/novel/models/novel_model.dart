@@ -27,6 +27,7 @@ class PackagingState extends Equatable {
   const PackagingState.idle() : this('Idle', false);
   const PackagingState.waiting() : this('Waiting', false);
   const PackagingState.busy() : this('Busy', false);
+  const PackagingState.thumbnail() : this('Downloading thumbnail', false);
 
   @override
   List<Object?> get props => [message, error];
@@ -180,17 +181,21 @@ class NovelModel extends ChangeNotifier {
     }
 
     await waitDownload(showAlert: false);
-    packagingState = const PackagingState.busy();
 
     // download thumbnail
-    var thumbnailResponse = novel!.thumbnailUrl != null
-        ? await http.get(Uri.parse(novel!.thumbnailUrl!))
-        : null;
+    var thumbnailBytes;
+    if (novel!.thumbnailUrl != null) {
+      packagingState = const PackagingState.thumbnail();
+      notifyListeners();
 
-    var bytes = await packager.package(
-      novel!,
-      thumbnailBytes: thumbnailResponse?.bodyBytes,
-    );
+      final response = await http.get(Uri.parse(novel!.thumbnailUrl!));
+      thumbnailBytes = response.bodyBytes;
+    }
+
+    packagingState = const PackagingState.busy();
+    notifyListeners();
+
+    var bytes = await packager.package(novel!, thumbnailBytes: thumbnailBytes);
 
     if (bytes == null) {
       alert.showAlert('Failed to package: epub is null');
@@ -199,6 +204,8 @@ class NovelModel extends ChangeNotifier {
 
     alert.showAlert('Packaged to epub');
     downloadFile(slugify(novel!.title) + '.epub', bytes);
+
     packagingState = const PackagingState.idle();
+    notifyListeners();
   }
 }

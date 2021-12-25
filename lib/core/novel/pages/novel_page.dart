@@ -37,14 +37,13 @@ class _NovelPageState extends State<NovelPage> {
       case NovelModelState.downloading:
         return idleView(context);
       case NovelModelState.loading:
-        return Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text(tuple.item2, style: Theme.of(context).textTheme.caption),
-            ],
-          ),
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(tuple.item2, style: Theme.of(context).textTheme.caption),
+          ],
         );
       case NovelModelState.notSupported:
         return const Center(
@@ -94,6 +93,12 @@ class _NovelPageState extends State<NovelPage> {
 
   double listViewPadding(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return width < 500 ? 0 : width * 0.06;
+    if (width < 500) {
+      return 0;
+    } else if (width > 1024) {
+      return (width - 1024) / 2;
+    } else {
+      return width * 0.06;
+    }
   }
 }

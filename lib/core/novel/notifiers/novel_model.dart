@@ -119,7 +119,7 @@ class NovelModel extends ChangeNotifier {
   }
 
   /// Download all chapter content if not already done so
-  Future<void> waitDownload() async {
+  Future<void> waitDownload({bool showAlert = true}) async {
     if (_crawler == null) {
       print('Download called when crawler was null');
       return;
@@ -149,6 +149,8 @@ class NovelModel extends ChangeNotifier {
 
     isDownloading = false;
     notifyListeners();
+
+    if (showAlert) alert.showAlert('Download completed');
   }
 
   Future<void> packEpub() async {
@@ -160,9 +162,11 @@ class NovelModel extends ChangeNotifier {
       return;
     }
 
-    await waitDownload();
+    await waitDownload(showAlert: false);
     packagingState = PackagingState.busy();
     // package
     packagingState = PackagingState.idle();
+
+    alert.showAlert('Packaged to epub');
   }
 }

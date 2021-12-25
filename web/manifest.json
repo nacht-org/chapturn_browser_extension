@@ -12,5 +12,12 @@
         "default_popup": "index.html",
         "default_icon": "/icons/Icon-192.png"
     },
+    "permissions": [
+        "downloads",
+        "webRequest",
+        "webRequestBlocking",
+        "<all_urls>"
+    ],
+    "incognito": "split",
     "manifest_version": 3
 }

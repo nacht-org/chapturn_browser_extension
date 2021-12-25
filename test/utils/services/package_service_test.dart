@@ -8,10 +8,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EpubPackager', () {
-    final url =
-        'https://www.scribblehub.com/series/180910/the-immortal-witchs-death-wish/';
-
     test('should package to epub', () async {
+      final novel = Novel(
+        title: 'Another',
+        url: 'https://test.service/epub',
+        lang: 'en',
+      );
+
+      var data = await EpubPackager().package(novel);
+    });
+
+    test('should package to epub (http)', () async {
+      const url =
+          'https://www.scribblehub.com/series/180910/the-immortal-witchs-death-wish/';
+
       var tuple = crawlerByUrl(url);
       if (tuple == null) {
         return;
@@ -28,6 +38,6 @@ void main() {
 
       var data = await EpubPackager().package(novel);
       await File('c:/Users/User/Desktop/test.epub').writeAsBytes(data!);
-    });
+    }, skip: 'Http request');
   });
 }

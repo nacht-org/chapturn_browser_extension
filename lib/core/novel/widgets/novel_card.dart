@@ -38,33 +38,35 @@ class NovelCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        novel.title,
-                        style: Theme.of(context).textTheme.headline5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      novel.title,
+                      style: Theme.of(context).textTheme.headline5,
+                    ),
+                    const SizedBox(height: 12.0),
+                    Text(
+                      'by ${novel.author ?? "❔"}',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                        '${novel.status ?? "Unknown"} • ${novel.chapterCount()} chapters'),
+                    const SizedBox(height: 8.0),
+                    Chip(
+                      label: Text(novel.lang),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      const SizedBox(height: 12.0),
-                      Text(
-                        'by ${novel.author ?? "❔"}',
-                        style: Theme.of(context).textTheme.subtitle1,
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                          '${novel.status ?? "Unknown"} • ${novel.chapterCount()} chapters'),
-                      const SizedBox(height: 8.0),
-                      Chip(
-                        label: Text(novel.lang),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: null,
+                      icon: Icon(Icons.library_add),
+                      tooltip: 'Add to library',
+                    ),
+                  ],
                 ),
               )
             ],

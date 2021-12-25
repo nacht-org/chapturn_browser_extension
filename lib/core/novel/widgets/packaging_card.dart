@@ -10,7 +10,7 @@ class PackagingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var notifier = context.watch<NovelModel>();
+    var _model = context.read<NovelModel>();
 
     return Card(
       child: Column(
@@ -21,7 +21,9 @@ class PackagingCard extends StatelessWidget {
             child: Text('Downloading & Packaging',
                 style: Theme.of(context).textTheme.headline6),
           ),
-          buildDownloadTile(notifier),
+          Consumer<NovelModel>(
+            builder: (context, model, child) => buildDownloadTile(model),
+          ),
           Selector<NovelModel, PackagingState>(
             selector: (context, notifier) => notifier.packagingState,
             builder: (context, state, child) {
@@ -29,7 +31,7 @@ class PackagingCard extends StatelessWidget {
                 title: const Text('Package'),
                 subtitle: Text(state.message),
                 leading: const Icon(Icons.book),
-                onTap: notifier.packEpub,
+                onTap: _model.packEpub,
               );
             },
           ),
@@ -39,17 +41,17 @@ class PackagingCard extends StatelessWidget {
     );
   }
 
-  Widget buildDownloadTile(NovelModel notifier) {
+  Widget buildDownloadTile(NovelModel model) {
     Icon? icon;
     String status;
-    switch (notifier.state) {
+    switch (model.state) {
       case NovelModelState.loading:
       case NovelModelState.notSupported:
       case NovelModelState.idle:
         status = 'Idle';
         break;
       case NovelModelState.downloading:
-        status = 'In progress: ${notifier.value} of ${notifier.total}';
+        status = 'In progress: ${model.value} of ${model.total}';
         icon = Icon(Icons.downloading);
         break;
     }
@@ -59,7 +61,7 @@ class PackagingCard extends StatelessWidget {
       subtitle: Text(status),
       leading: const Icon(Icons.download),
       trailing: icon,
-      onTap: notifier.isDownloading ? null : notifier.waitDownload,
+      onTap: model.isDownloading ? null : model.waitDownload,
     );
   }
 }

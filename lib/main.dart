@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(
             create: (context) => NovelModel(
-              'https://www.scribblehub.com/series/412369/new-perspectives/',
+              'https://www.scribblehub.com/series/412447/shonen-hero-system/',
               context.read<AlertModel>(),
             ),
           ),

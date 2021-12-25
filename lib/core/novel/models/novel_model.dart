@@ -27,18 +27,19 @@ class PackagingState extends Equatable {
   const PackagingState.idle() : this('Idle', false);
   const PackagingState.waiting() : this('Waiting', false);
   const PackagingState.busy() : this('Busy', false);
-  const PackagingState.thumbnail() : this('Downloading thumbnail', false);
+  const PackagingState.thumbnail() : this('Thumbnail', false);
 
   @override
   List<Object?> get props => [message, error];
 }
 
 class NovelModel extends ChangeNotifier {
+  String url;
+
   Meta? meta;
   NovelCrawler? _crawler;
   bool isLoading = true;
 
-  String url;
   Novel? novel;
 
   int value = 0;
@@ -49,8 +50,8 @@ class NovelModel extends ChangeNotifier {
 
   PackagingState packagingState = const PackagingState.idle();
 
-  AlertModel alert;
-  Packager packager;
+  final AlertModel alert;
+  final Packager packager;
 
   NovelModel(this.url, this.alert, {required this.packager}) {
     var tuple = crawlerByUrl(url);
@@ -115,6 +116,7 @@ class NovelModel extends ChangeNotifier {
     }
 
     novel = await _crawler!.parseNovel(url);
+
     if (novel != null) {
       volumes = Map.fromEntries(
         novel!.volumes.map((v) => MapEntry(v.index, VolumeModel(v))),
@@ -167,11 +169,16 @@ class NovelModel extends ChangeNotifier {
   }
 
   Future<void> packEpub() async {
-    packagingState = PackagingState.waiting();
+    await _packEpub();
+    packagingState = const PackagingState.idle();
+    notifyListeners();
+  }
+
+  Future<void> _packEpub() async {
+    packagingState = const PackagingState.waiting();
 
     if (isDownloading) {
       alert.showAlert('Another task already running');
-      packagingState = const PackagingState.idle();
       return;
     }
 
@@ -204,8 +211,5 @@ class NovelModel extends ChangeNotifier {
 
     alert.showAlert('Packaged to epub');
     downloadFile(slugify(novel!.title) + '.epub', bytes);
-
-    packagingState = const PackagingState.idle();
-    notifyListeners();
   }
 }

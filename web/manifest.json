@@ -1,23 +1,13 @@
 {
-    "name": "chapturn_browser_extension",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "name": "ChapturnExt",
     "description": "A new Flutter project.",
     "version": "1.0.0",
-    "icons": [],
-    "content_security_policy": {
-        "extension_pages": "script-src 'self' ; object-src 'self'"
-    },
     "action": {
         "default_popup": "index.html",
         "default_icon": "/icons/Icon-192.png"
     },
-    "permissions": [
-        "downloads",
-        "webRequest",
-        "webRequestBlocking",
-        "<all_urls>"
-    ],
+    "permissions": ["downloads", "webRequest"],
+    "host_permissions": ["<all_urls>"],
     "incognito": "split",
     "manifest_version": 3
 }

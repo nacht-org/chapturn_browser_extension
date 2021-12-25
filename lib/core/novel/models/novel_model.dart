@@ -6,6 +6,7 @@ import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../../alert/models/alert_model.dart';
 import 'chapter_model.dart';
@@ -127,8 +128,6 @@ class NovelModel extends ChangeNotifier {
     if (!hasData) {
       await loadNovel();
     }
-
-    print(novel);
   }
 
   /// Download all chapter content if not already done so
@@ -176,16 +175,25 @@ class NovelModel extends ChangeNotifier {
     }
 
     if (novel == null) {
-      print('Error: novel is null');
+      alert.showAlert('Failed to package: novel is null');
       return;
     }
 
     await waitDownload(showAlert: false);
     packagingState = const PackagingState.busy();
 
-    var bytes = await packager.package(novel!);
+    // download thumbnail
+    var thumbnailResponse = novel!.thumbnailUrl != null
+        ? await http.get(Uri.parse(novel!.thumbnailUrl!))
+        : null;
+
+    var bytes = await packager.package(
+      novel!,
+      thumbnailBytes: thumbnailResponse?.bodyBytes,
+    );
+
     if (bytes == null) {
-      alert.showAlert('Failed to package: null');
+      alert.showAlert('Failed to package: epub is null');
       return;
     }
 

@@ -8,7 +8,7 @@ import '../epub/writer.dart';
 
 abstract class Packager {
   String get name;
-  Future<List<int>?> package(Novel novel);
+  Future<List<int>?> package(Novel novel, {List<int>? thumbnailBytes});
 }
 
 @named

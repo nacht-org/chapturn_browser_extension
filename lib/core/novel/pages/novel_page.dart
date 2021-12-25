@@ -1,9 +1,8 @@
-import 'package:chapturn_browser_extension/core/novel/notifiers/novel_model.dart';
-import 'package:chapturn_sources/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
+import '../models/novel_model.dart';
 import '../widgets/about_novel_card.dart';
 import '../widgets/chapters_card.dart';
 import '../widgets/novel_card.dart';

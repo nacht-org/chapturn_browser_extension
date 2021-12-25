@@ -1,10 +1,13 @@
+import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
+import 'package:chapturn_browser_extension/utils/helpers/web_helper.dart';
+import 'package:chapturn_browser_extension/utils/services/package_service.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../alert/notifiers/alert_model.dart';
+import '../../alert/models/alert_model.dart';
 import 'chapter_model.dart';
 import 'volume_model.dart';
 
@@ -45,8 +48,9 @@ class NovelModel extends ChangeNotifier {
   PackagingState packagingState = const PackagingState.idle();
 
   AlertModel alert;
+  Packager packager;
 
-  NovelModel(this.url, this.alert) {
+  NovelModel(this.url, this.alert, {required this.packager}) {
     var tuple = crawlerByUrl(url);
     if (tuple == null) {
       return;
@@ -167,15 +171,26 @@ class NovelModel extends ChangeNotifier {
 
     if (isDownloading) {
       alert.showAlert('Another task already running');
-      packagingState = PackagingState.idle();
+      packagingState = const PackagingState.idle();
+      return;
+    }
+
+    if (novel == null) {
+      print('Error: novel is null');
       return;
     }
 
     await waitDownload(showAlert: false);
-    packagingState = PackagingState.busy();
-    // package
-    packagingState = PackagingState.idle();
+    packagingState = const PackagingState.busy();
 
+    var bytes = await packager.package(novel!);
+    if (bytes == null) {
+      alert.showAlert('Failed to package: null');
+      return;
+    }
     alert.showAlert('Packaged to epub');
+
+    downloadFile(slugify(novel!.title) + '.epub', bytes);
+    packagingState = const PackagingState.idle();
   }
 }

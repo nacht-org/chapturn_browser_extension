@@ -1,16 +1,18 @@
 import 'dart:convert' as convert;
 
 import 'package:chapturn_sources/models/models.dart';
+import 'package:injectable/injectable.dart';
 
 import '../epub/models.dart';
 import '../epub/writer.dart';
 
-/// packager interface
 abstract class Packager {
   String get name;
   Future<List<int>?> package(Novel novel);
 }
 
+@named
+@Injectable(as: Packager)
 class EpubPackager implements Packager {
   @override
   String get name => 'Epub';

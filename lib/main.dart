@@ -1,12 +1,17 @@
-import 'package:chapturn_browser_extension/core/alert/notifiers/alert_model.dart';
+import 'package:chapturn_browser_extension/core/alert/models/alert_model.dart';
 import 'package:chapturn_browser_extension/core/alert/widgets/alert_listener.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/novel_model.dart';
+import 'package:chapturn_browser_extension/core/novel/models/novel_model.dart';
+import 'package:chapturn_browser_extension/utils/injection.dart';
+import 'package:chapturn_browser_extension/utils/services/package_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';
 
 import 'core/novel/pages/novel_page.dart';
 
 void main() {
+  configureInjection();
   runApp(const MyApp());
 }
 
@@ -23,6 +28,7 @@ class MyApp extends StatelessWidget {
             create: (context) => NovelModel(
               'https://www.scribblehub.com/series/412447/shonen-hero-system/',
               context.read<AlertModel>(),
+              packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
             ),
           ),
         ],

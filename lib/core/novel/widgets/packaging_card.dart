@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/novel_model.dart';
+import '../models/novel_model.dart';
 
 class PackagingCard extends StatelessWidget {
   const PackagingCard({

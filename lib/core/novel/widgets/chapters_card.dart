@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/chapter_model.dart';
-import '../notifiers/novel_model.dart';
+import '../models/chapter_model.dart';
+import '../models/novel_model.dart';
 
 class ChaptersCard extends StatelessWidget {
   const ChaptersCard({

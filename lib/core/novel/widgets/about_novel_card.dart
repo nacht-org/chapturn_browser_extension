@@ -3,7 +3,7 @@ import 'package:chapturn_sources/models/models.dart' as models;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/novel_model.dart';
+import '../models/novel_model.dart';
 
 class AboutNovelCard extends StatelessWidget {
   const AboutNovelCard({

@@ -71,23 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text('Chapturn'),
         ),
         body: NovelPage(),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const [
-            BottomNavigationBarItem(
-              label: 'Book',
-              icon: Icon(Icons.book),
-            ),
-            BottomNavigationBarItem(
-              label: 'Browse',
-              icon: Icon(Icons.compass_calibration),
-            ),
-            BottomNavigationBarItem(
-              label: 'More',
-              icon: Icon(Icons.more_horiz),
-            ),
-          ],
-          landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-        ),
       ),
     );
   }

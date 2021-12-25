@@ -9,12 +9,12 @@ enum ChapterDownloadState {
   complete,
 }
 
-class ChapterNotifier extends ChangeNotifier {
+class ChapterModel extends ChangeNotifier {
   Chapter chapter;
   ChapterDownloadState state = ChapterDownloadState.pending;
   bool selected = true;
 
-  ChapterNotifier(this.chapter);
+  ChapterModel(this.chapter);
 
   ChapterDownloadState get tileState {
     if (chapter.content != null) {

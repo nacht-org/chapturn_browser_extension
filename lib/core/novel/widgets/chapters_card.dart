@@ -44,7 +44,7 @@ class ChapterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var model = context.watch<ChapterNotifier>();
+    var model = context.watch<ChapterModel>();
 
     return CheckboxListTile(
       title: Text(model.chapter.title),

@@ -38,7 +38,8 @@ class NovelModel extends ChangeNotifier {
 
   int value = 0;
   int total = 0;
-  List<VolumeNotifier> volumes = [];
+  List<VolumeModel> volumes = [];
+
   bool isDownloading = false;
 
   PackagingState packagingState = const PackagingState.idle();
@@ -81,7 +82,7 @@ class NovelModel extends ChangeNotifier {
     }
   }
 
-  List<ChapterNotifier> pendingDownload() {
+  List<ChapterModel> pendingDownload() {
     return [
       for (var chapters in volumes.map((e) => e.pendingDownload())) ...chapters
     ];
@@ -103,7 +104,7 @@ class NovelModel extends ChangeNotifier {
 
     novel = await _crawler!.parseNovel(url);
     if (novel != null) {
-      volumes = novel!.volumes.map((v) => VolumeNotifier(v)).toList();
+      volumes = novel!.volumes.map((v) => VolumeModel(v)).toList();
     }
 
     isLoading = false;

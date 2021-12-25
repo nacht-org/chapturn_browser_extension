@@ -3,18 +3,18 @@ import 'package:flutter/foundation.dart';
 
 import 'chapter_model.dart';
 
-class VolumeNotifier extends ChangeNotifier {
+class VolumeModel extends ChangeNotifier {
   Volume volume;
-  late List<ChapterNotifier> chapters;
+  late List<ChapterModel> chapters;
 
-  VolumeNotifier(this.volume) {
-    chapters = volume.chapters.map((c) => ChapterNotifier(c)).toList();
+  VolumeModel(this.volume) {
+    chapters = volume.chapters.map((c) => ChapterModel(c)).toList();
   }
 
   /// All selected chapters have content
   bool get isDownloaded => pendingDownload().isEmpty;
 
-  List<ChapterNotifier> pendingDownload() {
+  List<ChapterModel> pendingDownload() {
     return chapters.where((element) => element.shouldDownload).toList();
   }
 }

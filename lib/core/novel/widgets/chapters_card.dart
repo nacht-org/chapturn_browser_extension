@@ -25,7 +25,7 @@ class ChaptersCard extends StatelessWidget {
             ),
           ),
           if (model.volumes.isNotEmpty)
-            for (var ci in model.volumes[0].chapters)
+            for (var ci in model.volumes.values.first.chapters.values)
               ChangeNotifierProvider.value(
                 value: ci,
                 child: ChapterTile(model),
@@ -51,7 +51,10 @@ class ChapterTile extends StatelessWidget {
       subtitle: Text(model.chapter.updated?.toString() ?? '<unknown>'),
       secondary: Icon(tileIcon(model.tileState)),
       value: model.selected,
-      onChanged: novelModel.isDownloading ? null : model.select,
+      onChanged: novelModel.isDownloading
+          ? null
+          : (value) =>
+              novelModel.select(model.volume.index, model.chapter.index, value),
     );
   }
 

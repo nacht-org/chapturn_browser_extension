@@ -37,13 +37,17 @@ class _NovelPageState extends State<NovelPage> {
       case NovelModelState.downloading:
         return idleView(context);
       case NovelModelState.loading:
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text(tuple.item2, style: Theme.of(context).textTheme.caption),
-          ],
+        return Align(
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text(tuple.item2, style: Theme.of(context).textTheme.caption),
+            ],
+          ),
         );
       case NovelModelState.notSupported:
         return const Center(

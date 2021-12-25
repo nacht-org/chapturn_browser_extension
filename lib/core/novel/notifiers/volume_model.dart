@@ -5,16 +5,18 @@ import 'chapter_model.dart';
 
 class VolumeModel extends ChangeNotifier {
   Volume volume;
-  late List<ChapterModel> chapters;
+  late Map<int, ChapterModel> chapters;
 
   VolumeModel(this.volume) {
-    chapters = volume.chapters.map((c) => ChapterModel(c)).toList();
+    chapters = Map.fromEntries(
+      volume.chapters.map((c) => MapEntry(c.index, ChapterModel(volume, c))),
+    );
   }
 
   /// All selected chapters have content
   bool get isDownloaded => pendingDownload().isEmpty;
 
   List<ChapterModel> pendingDownload() {
-    return chapters.where((element) => element.shouldDownload).toList();
+    return chapters.values.where((element) => element.shouldDownload).toList();
   }
 }

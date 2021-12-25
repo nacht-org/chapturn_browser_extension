@@ -48,7 +48,7 @@ class PackagingCard extends StatelessWidget {
       case NovelModelState.loading:
       case NovelModelState.notSupported:
       case NovelModelState.idle:
-        status = 'Idle';
+        status = model.pendingDownload().isEmpty ? 'Completed' : 'Idle';
         break;
       case NovelModelState.downloading:
         status = 'In progress: ${model.value} of ${model.total}';

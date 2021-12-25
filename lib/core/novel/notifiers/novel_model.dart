@@ -38,7 +38,7 @@ class NovelModel extends ChangeNotifier {
 
   int value = 0;
   int total = 0;
-  List<VolumeModel> volumes = [];
+  Map<int, VolumeModel> volumes = {};
 
   bool isDownloading = false;
 
@@ -67,7 +67,7 @@ class NovelModel extends ChangeNotifier {
 
   /// Has novel information and all chapter content
   bool get isDownloaded {
-    return novel != null && volumes.every((v) => v.isDownloaded);
+    return novel != null && volumes.values.every((v) => v.isDownloaded);
   }
 
   NovelModelState get state {
@@ -84,7 +84,8 @@ class NovelModel extends ChangeNotifier {
 
   List<ChapterModel> pendingDownload() {
     return [
-      for (var chapters in volumes.map((e) => e.pendingDownload())) ...chapters
+      for (var chapters in volumes.values.map((e) => e.pendingDownload()))
+        ...chapters
     ];
   }
 
@@ -96,6 +97,11 @@ class NovelModel extends ChangeNotifier {
     return novel!.chapterCount();
   }
 
+  void select(int volumeIndex, int chapterIndex, bool? newValue) {
+    volumes[volumeIndex]?.chapters[chapterIndex]?.selected = newValue ?? false;
+    notifyListeners();
+  }
+
   /// Retrieve novel information
   Future<void> loadNovel() async {
     if (_crawler == null) {
@@ -104,7 +110,9 @@ class NovelModel extends ChangeNotifier {
 
     novel = await _crawler!.parseNovel(url);
     if (novel != null) {
-      volumes = novel!.volumes.map((v) => VolumeModel(v)).toList();
+      volumes = Map.fromEntries(
+        novel!.volumes.map((v) => MapEntry(v.index, VolumeModel(v))),
+      );
     }
 
     isLoading = false;

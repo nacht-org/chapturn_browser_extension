@@ -188,8 +188,8 @@ class NovelModel extends ChangeNotifier {
       alert.showAlert('Failed to package: null');
       return;
     }
-    alert.showAlert('Packaged to epub');
 
+    alert.showAlert('Packaged to epub');
     downloadFile(slugify(novel!.title) + '.epub', bytes);
     packagingState = const PackagingState.idle();
   }

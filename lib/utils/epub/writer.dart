@@ -302,6 +302,8 @@ class EpubWriter {
           builder.text(link.title);
         });
       });
+
+      builder.element('content', attributes: {'src': link.href});
     });
   }
 

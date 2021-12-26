@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
             create: (context) => NovelModel(
               alert: context.read<AlertModel>(),
               packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
-              browserService: getIt.get<BrowserService>(),
+              browser: getIt.get<BrowserService>(),
             ),
           ),
         ],

@@ -12,8 +12,6 @@ enum BrowserRuntimeMode {
 abstract class BrowserService {
   BrowserRuntimeMode get runtimeMode;
 
-  Future<String> get novelUrl;
-
   /// Relevent tab url
   Future<String> get href;
 
@@ -24,9 +22,6 @@ abstract class BrowserService {
 @Environment(Environment.prod)
 @Injectable(as: BrowserService)
 class BrowserServiceProd implements BrowserService {
-  @override
-  Future<String> get novelUrl => href;
-
   @override
   BrowserRuntimeMode get runtimeMode {
     final search = window.location.search;
@@ -64,14 +59,11 @@ class BrowserServiceProd implements BrowserService {
 @Injectable(as: BrowserService)
 class BrowserServiceDev implements BrowserService {
   @override
-  Future<String> get novelUrl async => href;
-
-  @override
   BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.tab;
 
   @override
   Future<String> get href async =>
-      'https://www.scribblehub.com/series/412447/shonen-hero-system/';
+      'https://www.royalroad.com/fiction/47826/millennial-mage';
 
   @override
   Future<void> openTabWindow() async {

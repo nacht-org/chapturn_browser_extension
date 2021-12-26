@@ -1,4 +1,5 @@
 import 'package:chapturn_browser_extension/constants/replacements.dart';
+import 'package:chapturn_browser_extension/core/novel/pages/novel_page.dart';
 
 String capitalize(String text) {
   if (text.isEmpty) {
@@ -10,6 +11,7 @@ String capitalize(String text) {
 
 final _dupeSpaceRegExp = RegExp(r'\s{2,}');
 final _punctuationRegExp = RegExp(r'[^\w\s-]');
+final _badCharRegExp = RegExp(r'''[\\/:*"\'<>|.%$^&£?]''');
 
 /// Converts [text] to a slug [String] separated by the [delimiter].
 String slugify(String text, {String delimiter = '-', bool lowercase = true}) {
@@ -33,4 +35,10 @@ String slugify(String text, {String delimiter = '-', bool lowercase = true}) {
       .replaceAll(' ', delimiter);
 
   return slug;
+}
+
+/// Converts [text] to a slug [String] by replacing bad
+/// characters with [replace]
+String slugifyMinimal(String text, {String replace = '_'}) {
+  return text.replaceAll(_badCharRegExp, replace);
 }

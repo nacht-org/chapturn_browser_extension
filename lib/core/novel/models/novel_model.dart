@@ -1,9 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
-import 'package:chapturn_browser_extension/utils/helpers/web_helper.dart';
-import 'package:chapturn_browser_extension/utils/services/package_service.dart';
-import 'package:chapturn_browser_extension/utils/services/browser_service.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
@@ -11,6 +7,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../utils/helpers/text_helper.dart';
+import '../../../utils/helpers/web_helper.dart';
+import '../../../utils/services/browser_service.dart';
+import '../../../utils/services/package_service.dart';
 import '../../alert/models/alert_model.dart';
 import 'chapter_model.dart';
 import 'volume_model.dart';
@@ -50,7 +50,6 @@ class NovelModel extends ChangeNotifier {
   String? url;
   Meta? meta;
   NovelCrawler? _crawler;
-  bool isLoading = true;
   bool isFetching = true;
 
   Novel? novel;
@@ -66,12 +65,12 @@ class NovelModel extends ChangeNotifier {
 
   final AlertModel alert;
   final Packager packager;
-  final BrowserService browserService;
+  final BrowserService browser;
 
   NovelModel({
     required this.alert,
     required this.packager,
-    required this.browserService,
+    required this.browser,
   });
 
   /// Novel is null
@@ -89,14 +88,14 @@ class NovelModel extends ChangeNotifier {
   }
 
   NovelModelState get state {
-    if (isLoading) {
+    if (url == null) {
       return NovelModelState.loading;
+    } else if (!isSupported) {
+      return NovelModelState.notSupported;
     } else if (isFetching) {
       return NovelModelState.fetching;
     } else if (isDownloading) {
       return NovelModelState.downloading;
-    } else if (!isSupported) {
-      return NovelModelState.notSupported;
     } else {
       return NovelModelState.idle;
     }
@@ -123,18 +122,20 @@ class NovelModel extends ChangeNotifier {
   }
 
   Future<void> load() async {
-    url = await browserService.novelUrl;
+    url = await browser.href;
     var tuple = crawlerByUrl(url!);
     if (tuple == null) {
+      notifyListeners();
       return;
     }
 
     meta = tuple.item1();
     _crawler = tuple.item2();
-    isLoading = false;
     notifyListeners();
 
-    loadNovelChecked();
+    if (isSupported) {
+      loadNovel();
+    }
   }
 
   /// Retrieve novel information
@@ -162,10 +163,12 @@ class NovelModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadNovelChecked() async {
-    if (!hasData) {
-      await loadNovel();
-    }
+  Future<void> reloadNovel() async {
+    novel = null;
+    isFetching = true;
+    notifyListeners();
+
+    await loadNovel();
   }
 
   /// Download all chapter content if not already done so
@@ -245,6 +248,6 @@ class NovelModel extends ChangeNotifier {
     }
 
     alert.showAlert('Packaged to epub');
-    downloadFile(slugify(novel!.title) + '.epub', bytes);
+    downloadFile(slugifyMinimal(novel!.title) + '.epub', bytes);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:chapturn_browser_extension/constants/widget_constants.dart';
+import 'package:chapturn_browser_extension/core/novel/widgets/source_no_support.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -44,9 +45,7 @@ class _NovelPageState extends State<NovelPage> {
           context,
         );
       case NovelModelState.notSupported:
-        return const Center(
-          child: Text('Not supported'),
-        );
+        return SourceNoSupport(tuple.item2!);
     }
   }
 

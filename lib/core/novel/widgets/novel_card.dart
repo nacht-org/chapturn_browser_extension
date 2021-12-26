@@ -11,6 +11,7 @@ class NovelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var model = context.read<NovelModel>();
     var novel = context.select<NovelModel, Novel?>((model) => model.novel)!;
 
     return SizedBox(
@@ -41,9 +42,19 @@ class NovelCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      novel.title,
-                      style: Theme.of(context).textTheme.headline5,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          novel.title,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                        IconButton(
+                          onPressed: model.reloadNovel,
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Reload novel',
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12.0),
                     Text(
@@ -61,10 +72,14 @@ class NovelCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.library_add),
-                      tooltip: 'Add to library',
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.library_add),
+                          tooltip: 'Add to library',
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -3,6 +3,7 @@ import 'package:chapturn_browser_extension/core/novel/widgets/source_no_support.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
+import 'dart:math' as math;
 
 import '../models/novel_model.dart';
 import '../widgets/about_novel_card.dart';
@@ -126,13 +127,17 @@ class _NovelPageState extends State<NovelPage> {
   }
 
   double listViewPadding(BuildContext context) {
+    const minWidth = 500;
+    const maxWidth = 1280;
+    const percent = 0.12 / 2;
+
     final width = MediaQuery.of(context).size.width;
-    if (width < 500) {
+    if (width < minWidth) {
       return 0;
-    } else if (width > 1024) {
-      return (width - 1024) / 2;
+    } else if (width < maxWidth) {
+      return width * percent;
     } else {
-      return width * 0.06;
+      return math.max(width * 0.06, ((width - maxWidth) / 2));
     }
   }
 }

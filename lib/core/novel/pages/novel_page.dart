@@ -73,11 +73,13 @@ class _NovelPageState extends State<NovelPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: normalPadding),
-              Text(
-                message,
-                style: Theme.of(context).textTheme.caption,
-              ),
+              if (message.isNotEmpty) ...[
+                const SizedBox(height: normalPadding),
+                Text(
+                  message,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ],
             ],
           ),
         ),

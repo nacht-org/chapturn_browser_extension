@@ -26,13 +26,13 @@ function openTabWindow() {
     });
 }
 
-async function activeUrl() {
+function activeUrl() {
     return new Promise(function (resolve, reject) {
         chrome.tabs.query(
             { currentWindow: true, active: true },
             function (tabs) {
                 if (tabs != null && 0 < tabs.length) {
-                    resolve(tabs[0].url ?? tabs[0].pendingUrl);
+                    resolve(tabs[0].url ?? tabs[0].pendingUrl ?? "");
                 } else {
                     reject();
                 }
@@ -43,5 +43,6 @@ async function activeUrl() {
 
 async function tabUrl(tabId) {
     const tab = await chrome.tabs.get(tabId);
-    return tab.url ?? tab.pendingUrl;
+    console.log(tab);
+    return tab.url ?? tab.pendingUrl ?? "";
 }

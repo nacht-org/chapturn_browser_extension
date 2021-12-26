@@ -2,6 +2,7 @@ import 'dart:html';
 
 import 'package:chapturn_browser_extension/external/js/popup.dart' as popup;
 import 'package:injectable/injectable.dart';
+import 'package:js/js_util.dart';
 
 enum BrowserRuntimeMode {
   popup,
@@ -41,12 +42,12 @@ class BrowserServiceProd implements BrowserService {
   Future<String> get href async {
     switch (runtimeMode) {
       case BrowserRuntimeMode.popup:
-        return popup.activeUrl();
+        return await promiseToFuture<String>(popup.activeUrl());
       case BrowserRuntimeMode.tab:
         final uri = Uri.parse(window.location.href);
         final tabId = uri.queryParameters['id'];
         if (tabId != null) {
-          return await popup.tabUrl(int.parse(tabId));
+          return await promiseToFuture<String>(popup.tabUrl(int.parse(tabId)));
         } else {
           return '';
         }

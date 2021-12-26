@@ -2,6 +2,7 @@
 library main;
 
 import 'package:js/js.dart';
+import 'dart:js_util';
 
 @JS('openTabWindow')
 external Future<void> openTabWindow();

@@ -1,26 +1,14 @@
 import 'dart:html';
 
-import 'package:chapturn_browser_extension/external/js/popup.dart' as popup;
 import 'package:injectable/injectable.dart';
+import 'package:chapturn_browser_extension/external/js/js.dart' as popup;
 import 'package:js/js_util.dart';
 
-enum BrowserRuntimeMode {
-  popup,
-  tab,
-}
+import 'browser_service.dart';
 
-abstract class BrowserService {
-  BrowserRuntimeMode get runtimeMode;
-
-  /// Relevent tab url
-  Future<String> get href;
-
-  /// Open popup in tab window
-  Future<void> openTabWindow();
-}
-
-@Environment(Environment.prod)
-@Injectable(as: BrowserService)
+// FIXME: Remove before production build
+// @Environment(Environment.prod)
+// @Injectable(as: BrowserService)
 class BrowserServiceProd implements BrowserService {
   @override
   BrowserRuntimeMode get runtimeMode {
@@ -52,21 +40,5 @@ class BrowserServiceProd implements BrowserService {
   @override
   Future<void> openTabWindow() {
     return popup.openTabWindow();
-  }
-}
-
-@Environment(Environment.dev)
-@Injectable(as: BrowserService)
-class BrowserServiceDev implements BrowserService {
-  @override
-  BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.tab;
-
-  @override
-  Future<String> get href async =>
-      'https://www.royalroad.com/fiction/47826/millennial-mage';
-
-  @override
-  Future<void> openTabWindow() async {
-    window.open(window.location.href, window.name ?? 'popup tab');
   }
 }

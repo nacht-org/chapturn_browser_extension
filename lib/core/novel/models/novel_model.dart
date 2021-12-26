@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../utils/helpers/text_helper.dart';
-import '../../../utils/helpers/web_helper.dart';
-import '../../../utils/services/browser_service.dart';
+import '../../../utils/helpers/io_helper/io_helper.dart';
+import '../../../utils/services/browser_service/browser_service.dart';
 import '../../../utils/services/package_service.dart';
 import '../../alert/models/alert_model.dart';
 import 'chapter_model.dart';

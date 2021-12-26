@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constants/widget_constants.dart';
 
+// TODO Show if rejected or discontinued
 class SourceNoSupport extends StatelessWidget {
   const SourceNoSupport(this.url, {Key? key}) : super(key: key);
 

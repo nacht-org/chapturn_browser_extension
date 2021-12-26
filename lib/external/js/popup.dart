@@ -2,6 +2,7 @@
 library main;
 
 import 'package:js/js.dart';
+// ignore: avoid_web_libraries_in_flutter, unused_import
 import 'dart:js_util';
 
 @JS('openTabWindow')

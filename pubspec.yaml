@@ -43,6 +43,7 @@ dependencies:
     equatable: ^2.0.3
     injectable: ^1.5.0
     get_it: ^7.2.0
+    js: ^0.6.3
 
 dev_dependencies:
     flutter_test:

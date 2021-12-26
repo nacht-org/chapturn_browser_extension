@@ -27,7 +27,7 @@ class ChaptersCard extends StatelessWidget {
           ),
           multi
               ? MultiVolumeView(model)
-              : ChapterList(
+              : SingleVolumeView(
                   model,
                   model.volumes.values.first.chapters.values.toList(),
                 ),
@@ -45,6 +45,7 @@ class MultiVolumeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var limit = model.chapterCount > 40;
     Widget child = ListView.builder(
       itemCount: model.flat.length,
       itemBuilder: (context, i) {
@@ -64,10 +65,10 @@ class MultiVolumeView extends StatelessWidget {
           );
         }
       },
-      shrinkWrap: true,
+      shrinkWrap: !limit,
     );
 
-    if (model.chapterCount > 40) {
+    if (limit) {
       child = LimitedBox(
         maxHeight: MediaQuery.of(context).size.height,
         child: child,
@@ -78,24 +79,26 @@ class MultiVolumeView extends StatelessWidget {
   }
 }
 
-class ChapterList extends StatelessWidget {
-  const ChapterList(this.model, this.chapters, {Key? key}) : super(key: key);
+class SingleVolumeView extends StatelessWidget {
+  const SingleVolumeView(this.model, this.chapters, {Key? key})
+      : super(key: key);
 
   final NovelModel model;
   final List<ChapterModel> chapters;
 
   @override
   Widget build(BuildContext context) {
+    var limit = chapters.length > 40;
     Widget child = ListView.builder(
       itemCount: chapters.length,
       itemBuilder: (context, i) => ChangeNotifierProvider.value(
         value: chapters[i],
         child: ChapterTile(model),
       ),
-      shrinkWrap: true,
+      shrinkWrap: !limit,
     );
 
-    if (chapters.length > 40) {
+    if (limit) {
       child = LimitedBox(
         maxHeight: MediaQuery.of(context).size.height,
         child: child,

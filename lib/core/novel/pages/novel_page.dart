@@ -1,3 +1,4 @@
+import 'package:chapturn_browser_extension/constants/widget_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -21,38 +22,67 @@ class _NovelPageState extends State<NovelPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NovelModel>().loadNovelChecked();
+    context.read<NovelModel>().load();
   }
 
   @override
   Widget build(BuildContext context) {
-    var tuple = context.select<NovelModel, Tuple2<NovelModelState, String>>(
+    var tuple = context.select<NovelModel, Tuple2<NovelModelState, String?>>(
       (model) => Tuple2(model.state, model.url),
     );
     print(tuple);
 
     switch (tuple.item1) {
+      case NovelModelState.loading:
+        return buildLoading('', context);
       case NovelModelState.idle:
       case NovelModelState.downloading:
         return idleView(context);
-      case NovelModelState.loading:
-        return Align(
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text(tuple.item2, style: Theme.of(context).textTheme.caption),
-            ],
-          ),
+      case NovelModelState.fetching:
+        return buildLoading(
+          tuple.item2 != null ? 'Fetching ' + tuple.item2! : 'Error: Empty url',
+          context,
         );
       case NovelModelState.notSupported:
         return const Center(
           child: Text('Not supported'),
         );
     }
+  }
+
+  Align buildLoading(String message, BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(normalPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(width: contentPadding),
+                  Text(
+                    'Please wait...',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ],
+              ),
+              const SizedBox(height: normalPadding),
+              Text(
+                message,
+                style: Theme.of(context).textTheme.caption,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   ListView idleView(BuildContext context) {

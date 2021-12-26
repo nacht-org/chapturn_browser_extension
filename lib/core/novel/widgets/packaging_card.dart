@@ -46,6 +46,7 @@ class PackagingCard extends StatelessWidget {
     String status;
     switch (model.state) {
       case NovelModelState.loading:
+      case NovelModelState.fetching:
       case NovelModelState.notSupported:
       case NovelModelState.idle:
         status = model.pendingDownload().isEmpty ? 'Completed' : 'Idle';

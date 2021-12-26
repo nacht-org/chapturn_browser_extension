@@ -1,7 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
 import 'package:chapturn_browser_extension/utils/helpers/web_helper.dart';
 import 'package:chapturn_browser_extension/utils/services/package_service.dart';
-import 'package:chapturn_browser_extension/utils/services/web_service.dart';
+import 'package:chapturn_browser_extension/utils/services/browser_service.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:chapturn_sources/interfaces/interfaces.dart';
 import 'package:chapturn_sources/models/models.dart';
@@ -15,6 +17,7 @@ import 'volume_model.dart';
 
 enum NovelModelState {
   loading,
+  fetching,
   idle,
   downloading,
   notSupported,
@@ -44,9 +47,11 @@ class ContentIndex {
 }
 
 class NovelModel extends ChangeNotifier {
+  String? url;
   Meta? meta;
   NovelCrawler? _crawler;
   bool isLoading = true;
+  bool isFetching = true;
 
   Novel? novel;
 
@@ -61,23 +66,13 @@ class NovelModel extends ChangeNotifier {
 
   final AlertModel alert;
   final Packager packager;
-  final WebService webService;
+  final BrowserService browserService;
 
   NovelModel({
     required this.alert,
     required this.packager,
-    required this.webService,
-  }) {
-    var tuple = crawlerByUrl(webService.novelUrl);
-    if (tuple == null) {
-      return;
-    }
-
-    meta = tuple.item1();
-    _crawler = tuple.item2();
-  }
-
-  String get url => webService.novelUrl;
+    required this.browserService,
+  });
 
   /// Novel is null
   bool get hasData => novel != null;
@@ -96,6 +91,8 @@ class NovelModel extends ChangeNotifier {
   NovelModelState get state {
     if (isLoading) {
       return NovelModelState.loading;
+    } else if (isFetching) {
+      return NovelModelState.fetching;
     } else if (isDownloading) {
       return NovelModelState.downloading;
     } else if (!isSupported) {
@@ -125,23 +122,28 @@ class NovelModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> load() async {
+    url = await browserService.novelUrl;
+    var tuple = crawlerByUrl(url!);
+    if (tuple == null) {
+      return;
+    }
+
+    meta = tuple.item1();
+    _crawler = tuple.item2();
+    isLoading = false;
+    notifyListeners();
+
+    loadNovelChecked();
+  }
+
   /// Retrieve novel information
   Future<void> loadNovel() async {
     if (_crawler == null) {
       return;
     }
 
-    novel = await _crawler!.parseNovel(url);
-    novel!.volumes.add(Volume(
-      index: 1,
-      name: 'Debug',
-      chapters: [
-        Chapter(
-            index: 200,
-            title: "Isekai",
-            url: novel!.volumes.first.chapters.first.url),
-      ],
-    ));
+    novel = await _crawler!.parseNovel(url!);
 
     if (novel != null) {
       final entries = <MapEntry<int, VolumeModel>>[];
@@ -156,7 +158,7 @@ class NovelModel extends ChangeNotifier {
       volumes = Map.fromEntries(entries);
     }
 
-    isLoading = false;
+    isFetching = false;
     notifyListeners();
   }
 
@@ -223,7 +225,7 @@ class NovelModel extends ChangeNotifier {
     await waitDownload(showAlert: false);
 
     // download thumbnail
-    var thumbnailBytes;
+    Uint8List? thumbnailBytes;
     if (novel!.thumbnailUrl != null) {
       packagingState = const PackagingState.thumbnail();
       notifyListeners();

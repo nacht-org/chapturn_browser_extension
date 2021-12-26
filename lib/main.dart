@@ -3,16 +3,23 @@ import 'package:chapturn_browser_extension/core/alert/widgets/alert_listener.dar
 import 'package:chapturn_browser_extension/core/novel/models/novel_model.dart';
 import 'package:chapturn_browser_extension/utils/injection.dart';
 import 'package:chapturn_browser_extension/utils/services/package_service.dart';
-import 'package:chapturn_browser_extension/utils/services/web_service.dart';
+import 'package:chapturn_browser_extension/utils/services/browser_service.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 
 import 'core/novel/pages/novel_page.dart';
 
 void main() {
-  configureInjection(Environment.dev);
-  runApp(const MyApp());
+  configureInjection(kReleaseMode ? Environment.prod : Environment.dev);
+
+  final browser = getIt.get<BrowserService>();
+  if (browser.runtimeMode == BrowserRuntimeMode.popup) {
+    browser.openTabWindow();
+  } else {
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -28,7 +35,7 @@ class MyApp extends StatelessWidget {
             create: (context) => NovelModel(
               alert: context.read<AlertModel>(),
               packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
-              webService: getIt.get<WebService>(),
+              browserService: getIt.get<BrowserService>(),
             ),
           ),
         ],

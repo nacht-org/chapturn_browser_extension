@@ -52,7 +52,7 @@ class _NovelPageState extends State<NovelPage> {
       alignment: Alignment.center,
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(normalPadding),
+          padding: const EdgeInsets.all(cNormalPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +63,7 @@ class _NovelPageState extends State<NovelPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const CircularProgressIndicator(),
-                  const SizedBox(width: contentPadding),
+                  const SizedBox(width: cContentPadding),
                   Text(
                     'Please wait...',
                     style: Theme.of(context).textTheme.subtitle1,
@@ -71,7 +71,7 @@ class _NovelPageState extends State<NovelPage> {
                 ],
               ),
               if (message.isNotEmpty) ...[
-                const SizedBox(height: normalPadding),
+                const SizedBox(height: cNormalPadding),
                 Text(
                   message,
                   style: Theme.of(context).textTheme.caption,
@@ -84,14 +84,10 @@ class _NovelPageState extends State<NovelPage> {
     );
   }
 
+  /// TODO move to another widget
   Widget idleView(BuildContext context, LoadedCrawlerState state) {
-    return ChangeNotifierProvider(
-      create: (context) => NovelModel(
-        url: state.url,
-        crawlerFactory: state.crawlerFactory,
-        alert: context.read<AlertModel>(),
-        packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
-      )..loadNovel(),
+    return ChangeNotifierProvider.value(
+      value: state.novel,
       child: Consumer<NovelModel>(builder: (context, model, child) {
         if (model.state == NovelModelState.fetching) {
           return buildLoading('Fetching ${model.url}', context);
@@ -112,14 +108,14 @@ class _NovelPageState extends State<NovelPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: const [
                       NovelCard(),
-                      SizedBox(height: 24),
+                      SizedBox(height: cNormalPadding),
                       PackagingCard(),
-                      SizedBox(height: 24),
+                      SizedBox(height: cNormalPadding),
                       ChaptersCard()
                     ],
                   ),
                 ),
-                const SizedBox(width: 24),
+                const SizedBox(width: cNormalPadding),
                 Expanded(
                   flex: 3,
                   child: Column(

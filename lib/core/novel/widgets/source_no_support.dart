@@ -17,7 +17,7 @@ class SourceNoSupport extends StatelessWidget {
         width: 500,
         child: Card(
           child: Padding(
-            padding: const EdgeInsets.all(normalPadding),
+            padding: const EdgeInsets.all(cNormalPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,7 +27,7 @@ class SourceNoSupport extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const Icon(Icons.error),
-                    const SizedBox(width: contentPadding),
+                    const SizedBox(width: cContentPadding),
                     Text(
                       uri.host,
                       style: Theme.of(context).textTheme.headline6,
@@ -41,12 +41,12 @@ class SourceNoSupport extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Divider(height: normalPadding * 2),
+                const Divider(height: cNormalPadding * 2),
                 const Text(
                     'This source is not currently supported by chapturn. You may request support by creating an issue on github.'),
-                const SizedBox(height: contentPadding),
+                const SizedBox(height: cContentPadding),
                 SelectableText(url),
-                const SizedBox(height: contentPadding),
+                const SizedBox(height: cContentPadding),
                 TextButton(
                   onPressed: () {}, // TODO
                   child: const Text('Request'),

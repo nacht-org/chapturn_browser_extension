@@ -9,6 +9,7 @@ import 'core/novel/models/crawler_model.dart';
 import 'core/novel/pages/novel_page.dart';
 import 'utils/injection.dart';
 import 'utils/services/browser_service/browser_service.dart';
+import 'utils/services/package_service.dart';
 
 void main() {
   configureInjection(kReleaseMode ? Environment.prod : Environment.dev);
@@ -32,6 +33,8 @@ class MyApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(
             create: (context) => CrawlerModel(
+              alert: context.read<AlertModel>(),
+              packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
               browser: getIt.get<BrowserService>(),
             ),
           ),

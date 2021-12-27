@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../utils/services/browser_service/browser_service.dart';
+import '../../../utils/services/package_service.dart';
+import '../../alert/models/alert_model.dart';
+import 'novel_model.dart';
 
 abstract class CrawlerState extends Equatable {}
 
@@ -12,13 +15,12 @@ class LoadingCrawlerState extends CrawlerState {
 }
 
 class LoadedCrawlerState extends CrawlerState {
-  final String url;
-  final CrawlerFactory crawlerFactory;
+  final NovelModel novel;
 
-  LoadedCrawlerState(this.url, this.crawlerFactory);
+  LoadedCrawlerState(this.novel);
 
   @override
-  List<Object?> get props => [url, crawlerFactory];
+  List<Object?> get props => [novel];
 }
 
 class NotSupportedCrawlerState extends CrawlerState {
@@ -34,8 +36,14 @@ class NotSupportedCrawlerState extends CrawlerState {
 class CrawlerModel extends ChangeNotifier {
   CrawlerState state = LoadingCrawlerState();
 
-  CrawlerModel({required this.browser});
+  CrawlerModel({
+    required this.browser,
+    required this.alert,
+    required this.packager,
+  });
 
+  final AlertModel alert;
+  final Packager packager;
   final BrowserService browser;
 
   Future<void> load() async {
@@ -55,9 +63,17 @@ class CrawlerModel extends ChangeNotifier {
       return NotSupportedCrawlerState(url, meta);
     }
 
-    return LoadedCrawlerState(url, item);
+    final novel = NovelModel(
+      url: url,
+      crawlerFactory: item,
+      alert: alert,
+      packager: packager,
+    )..loadNovel();
+
+    return LoadedCrawlerState(novel);
   }
 
+  /// Source has no support or has support but not for browser platform
   bool isNotSupported(Support support) {
     return support is NoSupport ||
         (support is HasSupport &&

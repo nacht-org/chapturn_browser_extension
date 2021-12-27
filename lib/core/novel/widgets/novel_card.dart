@@ -1,8 +1,8 @@
 import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:chapturn_webext/constants/widget_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants/widget_constants.dart';
 import '../models/novel_model.dart';
 
 class NovelCard extends StatelessWidget {
@@ -76,7 +76,7 @@ class NovelCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Row(
-                      children: [
+                      children: const [
                         IconButton(
                           onPressed: null,
                           icon: Icon(Icons.library_add),

@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/widget_constants.dart';
-import '../../../utils/injection.dart';
-import '../../../utils/services/package_service.dart';
-import '../../alert/models/alert_model.dart';
+import '../../../widgets/key_value_tile.dart';
+import '../../../widgets/modal_card.dart';
 import '../models/crawler_model.dart';
 import '../models/novel_model.dart';
 import '../widgets/about_novel_card.dart';
@@ -37,60 +36,50 @@ class _NovelPageState extends State<NovelPage> {
 
     final state = model.state;
     if (state is LoadingCrawlerState) {
-      return buildLoading('', context);
+      return ModalCard.forceCentered(const LoadingCard());
     } else if (state is LoadedCrawlerState) {
-      return idleView(context, state);
+      return CrawlerLoadedView(state: state);
     } else if (state is NotSupportedCrawlerState) {
       return SourceNoSupport(state.url);
     } else {
       return Container();
     }
   }
+}
 
-  Align buildLoading(String message, BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(cNormalPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(width: cContentPadding),
-                  Text(
-                    'Please wait...',
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ],
-              ),
-              if (message.isNotEmpty) ...[
-                const SizedBox(height: cNormalPadding),
-                Text(
-                  message,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+class CrawlerLoadedView extends StatelessWidget {
+  const CrawlerLoadedView({Key? key, required this.state}) : super(key: key);
 
-  /// TODO move to another widget
-  Widget idleView(BuildContext context, LoadedCrawlerState state) {
+  final LoadedCrawlerState state;
+
+  @override
+  Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: state.novel,
       child: Consumer<NovelModel>(builder: (context, model, child) {
         if (model.state == NovelModelState.fetching) {
-          return buildLoading('Fetching ${model.url}', context);
+          final uri = Uri.parse(model.url);
+
+          return ModalCard.forceCentered(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const LoadingCard(heading: 'Fetching...'),
+                const SizedBox(height: cNormalPadding),
+                ModalCard(
+                  heading: uri.host,
+                  headingIcon: const Icon(Icons.web_asset),
+                  children: [
+                    KeyValueTile('Path', uri.path),
+                    if (uri.hasQuery) ...[
+                      const SizedBox(height: cContentPadding),
+                      KeyValueTile('Query', uri.query),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          );
         }
 
         return ListView(

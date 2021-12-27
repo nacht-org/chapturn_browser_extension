@@ -1,5 +1,5 @@
 import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
-import 'package:chapturn_sources/models/models.dart' as models;
+import 'package:chapturn_sources/chapturn_sources.dart' as sources;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class AboutNovelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var novel = context.select<NovelModel, models.Novel?>((n) => n.novel)!;
+    var novel = context.select<NovelModel, sources.Novel?>((n) => n.novel)!;
 
     return Card(
       child: Padding(
@@ -40,7 +40,7 @@ class AboutNovelCard extends StatelessWidget {
     );
   }
 
-  List<Widget> buildDescription(BuildContext context, models.Novel novel) {
+  List<Widget> buildDescription(BuildContext context, sources.Novel novel) {
     const smallBox = SizedBox(height: 8.0);
 
     List<Widget> description = [];
@@ -57,18 +57,18 @@ class AboutNovelCard extends StatelessWidget {
     return description;
   }
 
-  List<Widget> buildGenres(BuildContext context, models.Novel novel) {
+  List<Widget> buildGenres(BuildContext context, sources.Novel novel) {
     var genres =
         novel.metadata.where((element) => element.name == 'subject').toList();
     return genres.isEmpty ? [] : buildChips(context, 'Genres', genres);
   }
 
-  List<Widget> buildMore(BuildContext context, models.Novel novel) {
+  List<Widget> buildMore(BuildContext context, sources.Novel novel) {
     List<Widget> multi = [];
     List<Widget> single = [];
 
     // process
-    final map = <String, List<models.MetaData>>{};
+    final map = <String, List<sources.MetaData>>{};
     for (var meta in novel.metadata) {
       if (meta.name == 'subject') {
         continue;
@@ -96,7 +96,7 @@ class AboutNovelCard extends StatelessWidget {
   }
 
   List<Widget> buildChips(
-      BuildContext context, String heading, List<models.MetaData> chips) {
+      BuildContext context, String heading, List<sources.MetaData> chips) {
     return [
       const SizedBox(height: 8.0),
       Text(

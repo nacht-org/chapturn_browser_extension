@@ -1,0 +1,4 @@
+enum BrowserRuntimeMode {
+  popup,
+  tab,
+}

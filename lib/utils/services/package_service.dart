@@ -1,6 +1,6 @@
 import 'dart:convert' as convert;
 
-import 'package:chapturn_sources/models/models.dart';
+import 'package:chapturn_sources/chapturn_Sources.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path/path.dart' as path;
 

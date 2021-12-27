@@ -1,7 +1,7 @@
 import 'package:archive/archive.dart';
 import 'package:chapturn_browser_extension/utils/epub/constants.dart';
 import 'package:chapturn_browser_extension/utils/epub/models.dart';
-import 'package:chapturn_sources/models/metadata.dart';
+import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:sprintf/sprintf.dart';
 import 'dart:convert' as convert;
 

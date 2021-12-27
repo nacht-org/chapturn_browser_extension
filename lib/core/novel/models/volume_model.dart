@@ -1,4 +1,4 @@
-import 'package:chapturn_sources/models/volume.dart';
+import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter/foundation.dart';
 
 import 'chapter_model.dart';

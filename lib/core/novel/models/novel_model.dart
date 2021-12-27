@@ -1,11 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:chapturn_sources/interfaces/interfaces.dart';
-import 'package:chapturn_sources/models/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:xml/xml.dart';
 
 import '../../../utils/helpers/text_helper.dart';
 import '../../../utils/helpers/io_helper/io_helper.dart';
@@ -123,14 +122,14 @@ class NovelModel extends ChangeNotifier {
 
   Future<void> load() async {
     url = await browser.href;
-    var tuple = crawlerByUrl(url!);
-    if (tuple == null) {
+    var item = crawlerByUrl(url!);
+    if (item == null) {
       notifyListeners();
       return;
     }
 
-    meta = tuple.item1();
-    _crawler = tuple.item2();
+    meta = item.meta();
+    _crawler = item.create();
     notifyListeners();
 
     if (isSupported) {
@@ -240,7 +239,17 @@ class NovelModel extends ChangeNotifier {
     packagingState = const PackagingState.busy();
     notifyListeners();
 
-    var bytes = await packager.package(novel!, thumbnailBytes: thumbnailBytes);
+    List<int>? bytes;
+    try {
+      bytes = await packager.package(novel!, thumbnailBytes: thumbnailBytes);
+    } catch (e) {
+      if (e is XmlParserException) {
+        alert.showAlert('Error parsing downloaded content: $e');
+      } else {
+        alert.showAlert('Failed to package');
+      }
+      return;
+    }
 
     if (bytes == null) {
       alert.showAlert('Failed to package: epub is null');

@@ -1,5 +1,4 @@
-import 'package:chapturn_sources/interfaces/interfaces.dart';
-import 'package:chapturn_sources/models/models.dart';
+import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter/material.dart';
 
 enum ChapterDownloadState {

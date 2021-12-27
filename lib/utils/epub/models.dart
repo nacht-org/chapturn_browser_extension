@@ -1,6 +1,6 @@
 import 'dart:convert' as convert;
 
-import 'package:chapturn_sources/models/metadata.dart';
+import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:mime/mime.dart' as mime;
 import 'package:path/path.dart' as path;
@@ -221,6 +221,7 @@ class EpubHtml extends EpubItem {
     return bodyElement.innerHtml;
   }
 
+  @override
   List<int> get html {
     final tree = XmlDocument.parse(chapterXml);
     final root = tree.rootElement;
@@ -263,12 +264,6 @@ class EpubHtml extends EpubItem {
         root.setAttribute('dir', direction?.name ?? book.direction!.name);
         body.attribute('dir', direction?.name ?? book.direction!.name);
       }
-
-      final htmlTree = parser.parse(content);
-      final bodyHtml = htmlTree.body;
-      if (bodyHtml != null) {
-        body.xml(bodyHtml.innerHtml);
-      }
     });
 
     // add head and body
@@ -276,7 +271,21 @@ class EpubHtml extends EpubItem {
       ..add(head.buildFragment())
       ..add(body.buildFragment());
 
-    return convert.utf8.encode(root.toXmlString(pretty: true));
+    var xml = root.toXmlString(pretty: true);
+
+    final _bodyRegExp = RegExp('<body.*/>');
+    final htmlTree = parser.parse(content);
+    final bodyHtml = htmlTree.body;
+    if (bodyHtml != null) {
+      final match = _bodyRegExp.firstMatch(xml)!.group(0)!;
+      final html = match.replaceRange(match.length - 2, match.length, '>') +
+          bodyHtml.innerHtml +
+          '</body>';
+
+      xml = xml.replaceFirst(_bodyRegExp, html);
+    }
+
+    return convert.utf8.encode(xml);
   }
 }
 

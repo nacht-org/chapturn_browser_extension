@@ -1,4 +1,5 @@
 import 'package:chapturn_sources/chapturn_sources.dart';
+import 'package:chapturn_webext/constants/widget_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,8 +32,9 @@ class NovelCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           semanticLabel: 'Novel thumbnail placeholder',
                         )
-                      : Image.network(
-                          novel.thumbnailUrl!,
+                      : FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/book-thumbnail.png',
+                          image: novel.thumbnailUrl!,
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -53,6 +55,7 @@ class NovelCard extends StatelessWidget {
                           onPressed: model.reloadNovel,
                           icon: const Icon(Icons.refresh),
                           tooltip: 'Reload novel',
+                          splashRadius: cSplashRadius,
                         ),
                       ],
                     ),

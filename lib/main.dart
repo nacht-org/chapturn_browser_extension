@@ -1,15 +1,14 @@
-import 'package:chapturn_webext/core/alert/models/alert_model.dart';
-import 'package:chapturn_webext/core/alert/widgets/alert_listener.dart';
-import 'package:chapturn_webext/core/novel/models/novel_model.dart';
-import 'package:chapturn_webext/utils/injection.dart';
-import 'package:chapturn_webext/utils/services/package_service.dart';
-import 'package:chapturn_webext/utils/services/browser_service/browser_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart';
 
+import 'core/alert/models/alert_model.dart';
+import 'core/alert/widgets/alert_listener.dart';
+import 'core/novel/models/crawler_model.dart';
 import 'core/novel/pages/novel_page.dart';
+import 'utils/injection.dart';
+import 'utils/services/browser_service/browser_service.dart';
 
 void main() {
   configureInjection(kReleaseMode ? Environment.prod : Environment.dev);
@@ -32,9 +31,7 @@ class MyApp extends StatelessWidget {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider(
-            create: (context) => NovelModel(
-              alert: context.read<AlertModel>(),
-              packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
+            create: (context) => CrawlerModel(
               browser: getIt.get<BrowserService>(),
             ),
           ),

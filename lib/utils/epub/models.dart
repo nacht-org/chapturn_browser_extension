@@ -21,6 +21,7 @@ class Section extends NavItem {
   Section(this.title, {List<NavItem>? items}) : items = items ?? [];
 }
 
+// TODO: remove? is this needed
 class Flat extends NavItem {
   List<EpubHtml> items;
   Flat([List<EpubHtml>? items]) : items = items ?? [];
@@ -97,6 +98,8 @@ const extensions = {
 enum EpubProperties {
   scripted,
 }
+
+final _bodyRegExp = RegExp('<body.*/>');
 
 class EpubItem {
   String? uid;
@@ -273,7 +276,6 @@ class EpubHtml extends EpubItem {
 
     var xml = root.toXmlString(pretty: true);
 
-    final _bodyRegExp = RegExp('<body.*/>');
     final htmlTree = parser.parse(content);
     final bodyHtml = htmlTree.body;
     if (bodyHtml != null) {

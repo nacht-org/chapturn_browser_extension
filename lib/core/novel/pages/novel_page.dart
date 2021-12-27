@@ -1,15 +1,19 @@
-import 'package:chapturn_webext/constants/widget_constants.dart';
-import 'package:chapturn_webext/core/novel/widgets/source_no_support.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../constants/widget_constants.dart';
+import '../../../utils/injection.dart';
+import '../../../utils/services/package_service.dart';
+import '../../alert/models/alert_model.dart';
+import '../models/crawler_model.dart';
 import '../models/novel_model.dart';
 import '../widgets/about_novel_card.dart';
 import '../widgets/chapters_card.dart';
 import '../widgets/novel_card.dart';
 import '../widgets/packaging_card.dart';
+import '../widgets/source_no_support.dart';
 
 class NovelPage extends StatefulWidget {
   const NovelPage({
@@ -24,29 +28,22 @@ class _NovelPageState extends State<NovelPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NovelModel>().load();
+    context.read<CrawlerModel>().load();
   }
 
   @override
   Widget build(BuildContext context) {
-    var tuple = context.select<NovelModel, Tuple2<NovelModelState, String?>>(
-      (model) => Tuple2(model.state, model.url),
-    );
-    print(tuple);
+    var model = context.watch<CrawlerModel>();
 
-    switch (tuple.item1) {
-      case NovelModelState.loading:
-        return buildLoading('', context);
-      case NovelModelState.idle:
-      case NovelModelState.downloading:
-        return idleView(context);
-      case NovelModelState.fetching:
-        return buildLoading(
-          tuple.item2 != null ? 'Fetching ' + tuple.item2! : 'Error: Empty url',
-          context,
-        );
-      case NovelModelState.notSupported:
-        return SourceNoSupport(tuple.item2!);
+    final state = model.state;
+    if (state is LoadingCrawlerState) {
+      return buildLoading('', context);
+    } else if (state is LoadedCrawlerState) {
+      return idleView(context, state);
+    } else if (state is NotSupportedCrawlerState) {
+      return SourceNoSupport(state.url);
+    } else {
+      return Container();
     }
   }
 
@@ -87,42 +84,56 @@ class _NovelPageState extends State<NovelPage> {
     );
   }
 
-  ListView idleView(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.symmetric(
-        vertical: 24.0,
-        horizontal: listViewPadding(context),
-      ),
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget idleView(BuildContext context, LoadedCrawlerState state) {
+    return ChangeNotifierProvider(
+      create: (context) => NovelModel(
+        url: state.url,
+        crawlerFactory: state.crawlerFactory,
+        alert: context.read<AlertModel>(),
+        packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
+      )..loadNovel(),
+      child: Consumer<NovelModel>(builder: (context, model, child) {
+        if (model.state == NovelModelState.fetching) {
+          return buildLoading('Fetching ${model.url}', context);
+        }
+
+        return ListView(
+          padding: EdgeInsets.symmetric(
+            vertical: 24.0,
+            horizontal: listViewPadding(context),
+          ),
           children: [
-            Expanded(
-              flex: 7,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: const [
-                  NovelCard(),
-                  SizedBox(height: 24),
-                  PackagingCard(),
-                  SizedBox(height: 24),
-                  ChaptersCard()
-                ],
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: const [
-                  AboutNovelCard(),
-                ],
-              ),
-            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: const [
+                      NovelCard(),
+                      SizedBox(height: 24),
+                      PackagingCard(),
+                      SizedBox(height: 24),
+                      ChaptersCard()
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: const [
+                      AboutNovelCard(),
+                    ],
+                  ),
+                ),
+              ],
+            )
           ],
-        )
-      ],
+        );
+      }),
     );
   }
 

@@ -45,9 +45,7 @@ class PackagingCard extends StatelessWidget {
     Icon? icon;
     String status;
     switch (model.state) {
-      case NovelModelState.loading:
       case NovelModelState.fetching:
-      case NovelModelState.notSupported:
       case NovelModelState.idle:
         final pending = model.pendingDownload();
         status = pending.isEmpty ? 'Completed' : '${pending.length} pending';

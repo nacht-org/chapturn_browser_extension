@@ -6,20 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 
-import '../../../utils/helpers/text_helper.dart';
 import '../../../utils/helpers/io_helper/io_helper.dart';
-import '../../../utils/services/browser_service/browser_service.dart';
+import '../../../utils/helpers/text_helper.dart';
 import '../../../utils/services/package_service.dart';
 import '../../alert/models/alert_model.dart';
 import 'chapter_model.dart';
 import 'volume_model.dart';
 
 enum NovelModelState {
-  loading,
   fetching,
   idle,
   downloading,
-  notSupported,
 }
 
 class PackagingState extends Equatable {
@@ -30,7 +27,7 @@ class PackagingState extends Equatable {
   const PackagingState.idle() : this('Idle', false);
   const PackagingState.waiting() : this('Waiting', false);
   const PackagingState.busy() : this('Busy', false);
-  const PackagingState.thumbnail() : this('Thumbnail', false);
+  const PackagingState.thumbnail() : this('Fetching thumbnail', false);
 
   @override
   List<Object?> get props => [message, error];
@@ -46,12 +43,12 @@ class ContentIndex {
 }
 
 class NovelModel extends ChangeNotifier {
-  String? url;
-  Meta? meta;
-  NovelCrawler? _crawler;
-  bool isFetching = true;
+  String url;
+  CrawlerFactory crawlerFactory;
+  final NovelCrawler _crawlerInstance;
 
   Novel? novel;
+  bool isFetching = true;
 
   int value = 0;
   int total = 0;
@@ -64,22 +61,16 @@ class NovelModel extends ChangeNotifier {
 
   final AlertModel alert;
   final Packager packager;
-  final BrowserService browser;
 
   NovelModel({
+    required this.url,
+    required this.crawlerFactory,
     required this.alert,
     required this.packager,
-    required this.browser,
-  });
+  }) : _crawlerInstance = crawlerFactory.create();
 
   /// Novel is null
   bool get hasData => novel != null;
-
-  /// Has a source and the source supports browser
-  bool get isSupported {
-    return meta != null &&
-        (meta!.support == Support.full || meta!.support == Support.browserOnly);
-  }
 
   /// Has novel information and all chapter content
   bool get isDownloaded {
@@ -87,11 +78,7 @@ class NovelModel extends ChangeNotifier {
   }
 
   NovelModelState get state {
-    if (url == null) {
-      return NovelModelState.loading;
-    } else if (!isSupported) {
-      return NovelModelState.notSupported;
-    } else if (isFetching) {
+    if (isFetching) {
       return NovelModelState.fetching;
     } else if (isDownloading) {
       return NovelModelState.downloading;
@@ -120,30 +107,9 @@ class NovelModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> load() async {
-    url = await browser.href;
-    var item = crawlerByUrl(url!);
-    if (item == null) {
-      notifyListeners();
-      return;
-    }
-
-    meta = item.meta();
-    _crawler = item.create();
-    notifyListeners();
-
-    if (isSupported) {
-      loadNovel();
-    }
-  }
-
   /// Retrieve novel information
   Future<void> loadNovel() async {
-    if (_crawler == null) {
-      return;
-    }
-
-    novel = await _crawler!.parseNovel(url!);
+    novel = await _crawlerInstance.parseNovel(url);
 
     if (novel != null) {
       final entries = <MapEntry<int, VolumeModel>>[];
@@ -172,11 +138,6 @@ class NovelModel extends ChangeNotifier {
 
   /// Download all chapter content if not already done so
   Future<void> waitDownload({bool showAlert = true}) async {
-    if (_crawler == null) {
-      print('Download called when crawler was null');
-      return;
-    }
-
     isDownloading = true;
     var pending = pendingDownload();
     if (pending.isEmpty) {
@@ -193,7 +154,7 @@ class NovelModel extends ChangeNotifier {
         continue;
       }
 
-      await c.download(_crawler!);
+      await c.download(_crawlerInstance);
 
       value++;
       notifyListeners();

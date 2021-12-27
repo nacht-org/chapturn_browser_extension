@@ -1,9 +1,9 @@
-import 'package:chapturn_browser_extension/core/alert/models/alert_model.dart';
-import 'package:chapturn_browser_extension/core/alert/widgets/alert_listener.dart';
-import 'package:chapturn_browser_extension/core/novel/models/novel_model.dart';
-import 'package:chapturn_browser_extension/utils/injection.dart';
-import 'package:chapturn_browser_extension/utils/services/package_service.dart';
-import 'package:chapturn_browser_extension/utils/services/browser_service/browser_service.dart';
+import 'package:chapturn_webext/core/alert/models/alert_model.dart';
+import 'package:chapturn_webext/core/alert/widgets/alert_listener.dart';
+import 'package:chapturn_webext/core/novel/models/novel_model.dart';
+import 'package:chapturn_webext/utils/injection.dart';
+import 'package:chapturn_webext/utils/services/package_service.dart';
+import 'package:chapturn_webext/utils/services/browser_service/browser_service.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';

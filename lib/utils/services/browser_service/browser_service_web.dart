@@ -2,7 +2,7 @@
 import 'dart:html';
 
 import 'package:injectable/injectable.dart';
-import 'package:chapturn_browser_extension/external/js/js.dart' as popup;
+import 'package:chapturn_webext/external/js/js.dart' as popup;
 import 'package:js/js_util.dart';
 
 import 'enums.dart';

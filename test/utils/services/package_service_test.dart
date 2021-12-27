@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:chapturn_browser_extension/utils/services/package_service.dart';
+import 'package:chapturn_webext/utils/services/package_service.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:chapturn_sources/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -27,8 +26,8 @@ void main() {
         return;
       }
 
-      final meta = tuple.item1();
-      final crawler = tuple.item2();
+      final meta = tuple.meta();
+      final crawler = tuple.create();
 
       final novel = await crawler.parseNovel(url);
       novel.volumes.add(Volume(

@@ -1,4 +1,4 @@
-import 'package:chapturn_browser_extension/core/alert/models/alert_model.dart';
+import 'package:chapturn_webext/core/alert/models/alert_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;

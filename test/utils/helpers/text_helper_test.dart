@@ -1,4 +1,4 @@
-import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
+import 'package:chapturn_webext/utils/helpers/text_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 

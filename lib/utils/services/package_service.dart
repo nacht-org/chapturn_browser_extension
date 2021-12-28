@@ -1,11 +1,10 @@
 import 'dart:convert' as convert;
 
-import 'package:chapturn_sources/chapturn_Sources.dart';
+import 'package:chapturn_sources/chapturn_Sources.dart' hide Namespace;
 import 'package:injectable/injectable.dart';
 import 'package:path/path.dart' as path;
-
-import '../epub/models.dart';
-import '../epub/writer.dart';
+import 'package:epublib/epublib.dart';
+import '../helpers/epub_helper.dart';
 
 abstract class Packager {
   String get name;
@@ -36,7 +35,7 @@ class EpubPackager implements Packager {
     book.addAuthor(novel.author ?? 'author');
     if (novel.description.isNotEmpty) {
       book.addMetaData(
-        namespace: Namespace.DC,
+        namespace: Namespace.dc,
         name: 'description',
         value: novel.description.join('\n'),
       );
@@ -44,19 +43,19 @@ class EpubPackager implements Packager {
 
     if (novel.status != null) {
       book.addMetaData(
-        namespace: Namespace.OPF,
+        namespace: Namespace.dc,
         name: 'status',
         value: novel.status!,
       );
     }
 
     // all metadata
-    for (var m in novel.metadata) {
+    for (var meta in novel.metadata) {
       book.addMetaData(
-        namespace: m.namespace,
-        name: m.name,
-        value: m.value,
-        others: m.others,
+        namespace: meta.namespace.to(),
+        name: meta.name,
+        value: meta.value,
+        others: meta.others,
       );
     }
 
@@ -65,7 +64,7 @@ class EpubPackager implements Packager {
       chapterMap[volume] = [];
 
       for (var chapter in volume.chapters) {
-        var epubChapter = chapter_html(novel, chapter);
+        var epubChapter = chapterHtml(novel, chapter);
         book.addItem(epubChapter);
         chapterMap[volume]!.add(epubChapter);
       }
@@ -92,7 +91,7 @@ class EpubPackager implements Packager {
     return EpubWriter(novel.title, book).write();
   }
 
-  EpubHtml chapter_html(Novel novel, Chapter chapter) {
+  EpubHtml chapterHtml(Novel novel, Chapter chapter) {
     final content = '<h1>${chapter.title}</h1>${chapter.content}';
     final filename =
         'chapters/' + chapter.index.toString().padLeft(4, "0") + '.xhtml';

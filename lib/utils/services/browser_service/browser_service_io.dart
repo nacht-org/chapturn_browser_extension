@@ -1,8 +1,8 @@
 import 'browser_service.dart';
 
-BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.tab;
+BrowserRuntimeMode pRuntimeMode() => BrowserRuntimeMode.tab;
 
-Future<String> get href async =>
+Future<String> pHref() async =>
     'https://www.scribblehub.com/series/269454/the-new-chimera/r';
 
-Future<void> openTabWindow() async {}
+Future<void> pOpenTabWindow() async {}

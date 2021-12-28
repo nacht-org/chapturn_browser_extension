@@ -15,7 +15,7 @@ class ModalCard extends StatelessWidget {
   final List<Widget>? children;
   final List<Widget>? actions;
 
-  static Widget forceCentered(Widget child, {double? width}) {
+  static Widget forceCentered({required Widget child, double? width}) {
     return Center(
       child: SizedBox(
         width: width ?? cPreferredCardWidth,
@@ -55,7 +55,7 @@ class ModalCard extends StatelessWidget {
               ...children!,
             ],
             if (hasBottom) ...[
-              divider,
+              const SizedBox(height: cNormalPadding),
               Row(
                 children: actions!,
               ),

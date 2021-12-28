@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'enums.dart';
 
-export 'browser_service_web.dart'
+import 'browser_service_web.dart'
     if (dart.library.io) 'browser_service_io.dart';
 
 export 'enums.dart';
@@ -20,13 +20,13 @@ abstract class BrowserService {
 @Injectable(as: BrowserService)
 class BrowserServiceProd implements BrowserService {
   @override
-  BrowserRuntimeMode get runtimeMode => runtimeMode;
+  BrowserRuntimeMode get runtimeMode => pRuntimeMode();
 
   @override
-  Future<String> get href => href;
+  Future<String> get href => pHref();
 
   @override
-  Future<void> openTabWindow() => openTabWindow();
+  Future<void> openTabWindow() => pOpenTabWindow();
 }
 
 @Environment(Environment.dev)
@@ -37,7 +37,7 @@ class BrowserServiceDev implements BrowserService {
 
   @override
   Future<String> get href async =>
-      'https://www.scribblehub.com/series/269454/the-new-chimera/r';
+      'https://www.webnovel.com/book/cultivating-disciples-to-breakthrough_19477270406566505';
 
   @override
   Future<void> openTabWindow() async {}

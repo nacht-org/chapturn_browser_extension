@@ -1,13 +1,12 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 
-import 'package:injectable/injectable.dart';
 import 'package:chapturn_webext/external/js/js.dart' as popup;
 import 'package:js/js_util.dart';
 
 import 'enums.dart';
 
-BrowserRuntimeMode get runtimeMode {
+BrowserRuntimeMode pRuntimeMode() {
   final search = window.location.search;
 
   if (search == null || search.trim().isEmpty) {
@@ -17,8 +16,8 @@ BrowserRuntimeMode get runtimeMode {
   }
 }
 
-Future<String> get href async {
-  switch (runtimeMode) {
+Future<String> pHref() async {
+  switch (pRuntimeMode()) {
     case BrowserRuntimeMode.popup:
       return await promiseToFuture<String>(popup.activeUrl());
     case BrowserRuntimeMode.tab:
@@ -32,6 +31,6 @@ Future<String> get href async {
   }
 }
 
-Future<void> openTabWindow() {
+Future<void> pOpenTabWindow() {
   return popup.openTabWindow();
 }

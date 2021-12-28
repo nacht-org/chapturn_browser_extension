@@ -7,20 +7,16 @@ Future<void> downloadFile(
   String? mimetype,
   Duration wait = const Duration(milliseconds: 100),
 }) async {
-  if (html.document.body == null) {
-    print('Body not found');
-    return;
-  }
-
   final _mimetype = mimetype ?? mime.lookupMimeType(filename);
 
   final blob = html.Blob([bytes], _mimetype);
   final url = html.Url.createObjectUrlFromBlob(blob);
   final a = html.AnchorElement()
     ..href = url
-    ..download = filename;
+    ..download = filename
+    ..setAttribute('hidden', 'true');
 
-  html.document.body!.append(a);
+  html.document.append(a);
   a.click();
 
   // Wait for click event to be processed and cleanup

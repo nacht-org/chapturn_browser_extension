@@ -12,7 +12,7 @@ import '../widgets/about_novel_card.dart';
 import '../widgets/chapters_card.dart';
 import '../widgets/novel_card.dart';
 import '../widgets/packaging_card.dart';
-import '../widgets/source_no_support.dart';
+import '../widgets/source_unsupported_card.dart';
 
 class NovelPage extends StatefulWidget {
   const NovelPage({
@@ -36,11 +36,11 @@ class _NovelPageState extends State<NovelPage> {
 
     final state = model.state;
     if (state is LoadingCrawlerState) {
-      return ModalCard.forceCentered(const LoadingCard());
+      return ModalCard.forceCentered(child: const LoadingCard());
     } else if (state is LoadedCrawlerState) {
       return CrawlerLoadedView(state: state);
     } else if (state is NotSupportedCrawlerState) {
-      return SourceNoSupport(state.url);
+      return SourceUnsupportedCard(state.url, state.meta);
     } else {
       return Container();
     }
@@ -61,7 +61,7 @@ class CrawlerLoadedView extends StatelessWidget {
           final uri = Uri.parse(model.url);
 
           return ModalCard.forceCentered(
-            Column(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const LoadingCard(heading: 'Fetching...'),

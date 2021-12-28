@@ -51,7 +51,7 @@ class PackagingCard extends StatelessWidget {
         status = pending.isEmpty ? 'Completed' : '${pending.length} pending';
         break;
       case NovelModelState.downloading:
-        status = 'In progress: ${model.value} of ${model.total}';
+        status = 'Progress: ${model.value} of ${model.total}';
         icon = const Icon(Icons.downloading);
         break;
     }

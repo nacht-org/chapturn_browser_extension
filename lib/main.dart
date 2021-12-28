@@ -1,4 +1,4 @@
-import 'package:chapturn_webext/constants/widget_constants.dart';
+import 'package:chapturn_browser_extension/constants/widget_constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';

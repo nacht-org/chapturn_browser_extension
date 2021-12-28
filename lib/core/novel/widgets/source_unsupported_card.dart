@@ -1,5 +1,5 @@
 import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:chapturn_webext/constants/package_constants.dart';
+import 'package:chapturn_browser_extension/constants/package_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';

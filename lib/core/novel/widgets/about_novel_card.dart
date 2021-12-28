@@ -1,4 +1,4 @@
-import 'package:chapturn_webext/utils/helpers/text_helper.dart';
+import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
 import 'package:chapturn_sources/chapturn_sources.dart' as sources;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,5 +1,5 @@
-import 'package:chapturn_webext/constants/replacements.dart';
-import 'package:chapturn_webext/core/novel/pages/novel_page.dart';
+import 'package:chapturn_browser_extension/constants/replacements.dart';
+import 'package:chapturn_browser_extension/core/novel/pages/novel_page.dart';
 
 String capitalize(String text) {
   if (text.isEmpty) {

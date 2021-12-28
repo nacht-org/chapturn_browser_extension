@@ -1,7 +1,7 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 
-import 'package:chapturn_webext/external/js/js.dart' as popup;
+import 'package:chapturn_browser_extension/external/js/js.dart' as popup;
 import 'package:js/js_util.dart';
 
 import 'enums.dart';

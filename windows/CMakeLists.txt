@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(chapturn_webext LANGUAGES CXX)
+project(chapturn_browser_extension LANGUAGES CXX)
 
-set(BINARY_NAME "chapturn_webext")
+set(BINARY_NAME "chapturn_browser_extension")
 
 cmake_policy(SET CMP0063 NEW)
 

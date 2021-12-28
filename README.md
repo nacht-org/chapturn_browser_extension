@@ -1,4 +1,4 @@
-# chapturn_webext
+# chapturn_browser_extension
 
 A new Flutter project.
 

@@ -55,8 +55,6 @@ class FetchingView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const LoadingCard(heading: 'Fetching...'),
-          const SizedBox(height: cNormalPadding),
           ModalCard(
             heading: uri.host,
             headingIcon: const Icon(Icons.web_asset),
@@ -68,6 +66,8 @@ class FetchingView extends StatelessWidget {
               ],
             ],
           ),
+          const SizedBox(height: cNormalPadding),
+          const LoadingCard(heading: 'Fetching...'),
         ],
       ),
     );
@@ -95,7 +95,7 @@ class CrawlerLoadedView extends StatelessWidget {
                 children: const [
                   NovelCard(),
                   SizedBox(height: cNormalPadding),
-                  // PackagingCard(),
+                  PackagingCard(),
                   SizedBox(height: cNormalPadding),
                   ChaptersCard()
                 ],

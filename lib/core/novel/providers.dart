@@ -19,47 +19,50 @@ final crawlerNotifierProvider =
 final crawlerDataProvider =
     Provider<DataCrawlerState>((ref) => throw UnimplementedError());
 
-// class VolumeState {
-//   final Volume volume;
-//   final List<ChapterState> chapters;
+class VolumeState {
+  final Volume volume;
+  final List<ChapterState> chapters;
 
-//   VolumeState(this.volume, this.chapters);
-//   VolumeState.from(this.volume)
-//       : chapters = volume.chapters
-//             .map((chapter) => ChapterState(volume, chapter))
-//             .toList();
+  VolumeState(this.volume, this.chapters);
+  VolumeState.from(this.volume)
+      : chapters = volume.chapters
+            .map((chapter) => ChapterState(volume, chapter))
+            .toList();
 
-//   VolumeState copyWith({
-//     Volume? volume,
-//     List<ChapterState>? chapters,
-//   }) {
-//     return VolumeState(
-//       volume ?? this.volume,
-//       chapters ?? this.chapters,
-//     );
-//   }
-// }
+  VolumeState copyWith({
+    Volume? volume,
+    List<ChapterState>? chapters,
+  }) {
+    return VolumeState(
+      volume ?? this.volume,
+      chapters ?? this.chapters,
+    );
+  }
+}
 
-// class ChapterList extends StateNotifier<List<VolumeState>> {
-//   ChapterList(List<Volume> state)
-//       : super(state.map((volume) => VolumeState.from(volume)).toList());
+class ChapterList extends StateNotifier<List<VolumeState>> {
+  ChapterList(List<Volume> state)
+      : super(state.map((volume) => VolumeState.from(volume)).toList());
 
-//   void toggle(int chapterIndex, bool? value) {
-//     state = [
-//       for (var volume in state)
-//         volume.copyWith(chapters: [
-//           for (var chapter in volume.chapters)
-//             if (chapter.chapter.index == chapterIndex)
-//               chapter.copy(isSelected: value ?? true)
-//             else
-//               chapter
-//         ])
-//     ];
-//   }
-// }
+  void toggle(int chapterIndex, bool? value) {
+    state = [
+      for (var volume in state)
+        volume.copyWith(chapters: [
+          for (var chapter in volume.chapters)
+            if (chapter.chapter.index == chapterIndex)
+              chapter.copyWith(isSelected: value ?? true)
+            else
+              chapter
+        ])
+    ];
+  }
+}
 
-final chapterListProvider = Provider<List<Volume>>(
-  (ref) => ref.watch(crawlerDataProvider).novel.volumes,
+final chapterListProvider =
+    StateNotifierProvider<ChapterList, List<VolumeState>>(
+  (ref) {
+    return ChapterList(ref.watch(crawlerDataProvider).novel.volumes);
+  },
   dependencies: [crawlerDataProvider],
 );
 
@@ -81,7 +84,7 @@ final multiVolumeProvider = Provider<List<ChapterListItem>>(
     final items = <ChapterListItem>[];
 
     for (var volume in ref.watch(chapterListProvider)) {
-      items.add(ChapterListItem.volume(volume));
+      items.add(ChapterListItem.volume(volume.volume));
 
       for (var chapter in volume.chapters) {
         items.add(ChapterListItem.chapter(chapter));
@@ -93,34 +96,67 @@ final multiVolumeProvider = Provider<List<ChapterListItem>>(
   dependencies: [chapterListProvider],
 );
 
-final singleVolumeProvider = Provider<List<Chapter>>(
-  (ref) => ref.watch(chapterListProvider).first.chapters,
-  dependencies: [chapterListProvider],
-);
-
-/// should be overriden when building chapter list
-final chapterProvider = Provider<Chapter>((ref) => throw UnimplementedError());
-
-final chapterStateProvider = StateNotifierProvider.autoDispose
-    .family<ChapterNotifier, ChapterState, Chapter>(
-  (ref, chapter) => ChapterNotifier(ChapterState(chapter)),
-);
-
-final pendingChaptersProvider = Provider.autoDispose<List<Chapter>>(
+final singleVolumeProvider = Provider<List<ChapterState>>(
   (ref) {
-    final pending = <Chapter>[];
-
-    final volumes = ref.watch(chapterListProvider);
-    for (var volume in volumes) {
-      for (var chapter in volume.chapters) {
-        final cs = ref.watch(chapterStateProvider(chapter));
-        if (cs.shouldDownload) {
-          pending.add(chapter);
-        }
-      }
-    }
-
-    return pending;
+    return ref.watch(chapterListProvider).first.chapters;
   },
   dependencies: [chapterListProvider],
 );
+
+final pendingProvider = Provider<List<ChapterState>>(
+  (ref) {
+    return [
+      for (var vs in ref.watch(chapterListProvider))
+        for (var cs in vs.chapters)
+          if (cs.shouldDownload) cs
+    ];
+  },
+  dependencies: [chapterListProvider],
+);
+
+class DownloadStatesNotifier
+    extends StateNotifier<Map<int, ChapterDownloadState>> {
+  DownloadStatesNotifier(Map<int, ChapterDownloadState> state) : super(state);
+}
+
+final downloadStatesProvider = StateNotifierProvider<DownloadStatesNotifier,
+    Map<int, ChapterDownloadState>>(
+  (ref) {
+    final chapterList = ref.watch(chapterListProvider);
+
+    final map = <int, ChapterDownloadState>{};
+    for (var vs in chapterList) {
+      for (var cs in vs.chapters) {
+        map[cs.chapter.index] = ChapterDownloadState.pending;
+      }
+    }
+
+    return DownloadStatesNotifier(map);
+  },
+  dependencies: [chapterListProvider],
+);
+
+final chapterDownloadStateProvider =
+    Provider.autoDispose.family<ChapterDownloadState, int>(
+  (ref, index) {
+    return ref.watch(downloadStatesProvider)[index]!;
+  },
+  dependencies: [downloadStatesProvider],
+);
+
+final downloadNotifierProvider =
+    StateNotifierProvider<DownloadNotifier, DownloadState>(
+  (ref) {
+    return DownloadNotifier(ref.read, ref.watch(pendingProvider));
+  },
+  dependencies: [pendingProvider, downloadStatesProvider.notifier],
+);
+
+final isDownloadingProvider = Provider<bool>(
+  (ref) => ref.watch(downloadNotifierProvider) is ProgressDownloadState,
+  dependencies: [downloadNotifierProvider],
+);
+
+/// should be overriden when building chapter list
+final chapterProvider =
+    Provider<ChapterState>((ref) => throw UnimplementedError());

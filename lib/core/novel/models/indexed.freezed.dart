@@ -23,7 +23,7 @@ class _$ChapterListItemTearOff {
     );
   }
 
-  _ChapterListItem chapter(Chapter chapter) {
+  _ChapterListItem chapter(ChapterState chapter) {
     return _ChapterListItem(
       chapter,
     );
@@ -38,19 +38,19 @@ mixin _$ChapterListItem {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Volume volume) volume,
-    required TResult Function(Chapter chapter) chapter,
+    required TResult Function(ChapterState chapter) chapter,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -158,7 +158,7 @@ class _$_VolumeListItem implements _VolumeListItem {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Volume volume) volume,
-    required TResult Function(Chapter chapter) chapter,
+    required TResult Function(ChapterState chapter) chapter,
   }) {
     return volume(this.volume);
   }
@@ -167,7 +167,7 @@ class _$_VolumeListItem implements _VolumeListItem {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
   }) {
     return volume?.call(this.volume);
   }
@@ -176,7 +176,7 @@ class _$_VolumeListItem implements _VolumeListItem {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
     required TResult orElse(),
   }) {
     if (volume != null) {
@@ -231,7 +231,7 @@ abstract class _$ChapterListItemCopyWith<$Res> {
   factory _$ChapterListItemCopyWith(
           _ChapterListItem value, $Res Function(_ChapterListItem) then) =
       __$ChapterListItemCopyWithImpl<$Res>;
-  $Res call({Chapter chapter});
+  $Res call({ChapterState chapter});
 }
 
 /// @nodoc
@@ -253,7 +253,7 @@ class __$ChapterListItemCopyWithImpl<$Res>
       chapter == freezed
           ? _value.chapter
           : chapter // ignore: cast_nullable_to_non_nullable
-              as Chapter,
+              as ChapterState,
     ));
   }
 }
@@ -264,7 +264,7 @@ class _$_ChapterListItem implements _ChapterListItem {
   const _$_ChapterListItem(this.chapter);
 
   @override
-  final Chapter chapter;
+  final ChapterState chapter;
 
   @override
   String toString() {
@@ -292,7 +292,7 @@ class _$_ChapterListItem implements _ChapterListItem {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(Volume volume) volume,
-    required TResult Function(Chapter chapter) chapter,
+    required TResult Function(ChapterState chapter) chapter,
   }) {
     return chapter(this.chapter);
   }
@@ -301,7 +301,7 @@ class _$_ChapterListItem implements _ChapterListItem {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
   }) {
     return chapter?.call(this.chapter);
   }
@@ -310,7 +310,7 @@ class _$_ChapterListItem implements _ChapterListItem {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(Volume volume)? volume,
-    TResult Function(Chapter chapter)? chapter,
+    TResult Function(ChapterState chapter)? chapter,
     required TResult orElse(),
   }) {
     if (chapter != null) {
@@ -352,9 +352,9 @@ class _$_ChapterListItem implements _ChapterListItem {
 }
 
 abstract class _ChapterListItem implements ChapterListItem {
-  const factory _ChapterListItem(Chapter chapter) = _$_ChapterListItem;
+  const factory _ChapterListItem(ChapterState chapter) = _$_ChapterListItem;
 
-  Chapter get chapter;
+  ChapterState get chapter;
   @JsonKey(ignore: true)
   _$ChapterListItemCopyWith<_ChapterListItem> get copyWith =>
       throw _privateConstructorUsedError;

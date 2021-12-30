@@ -3,53 +3,40 @@ import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-part 'chapter_state.freezed.dart';
+import 'download_notifier.dart';
 
-enum ChapterDownloadState {
-  pending,
-  unselected,
-  inProgress,
-  complete,
-}
+class ChapterState {
+  final Volume volume;
+  final Chapter chapter;
+  final bool isSelected;
 
-@freezed
-class ChapterState with _$ChapterState {
-  const ChapterState._();
+  ChapterState(
+    this.volume,
+    this.chapter, {
+    this.isSelected = true,
+  });
 
-  const factory ChapterState(
-    Chapter chapter, {
-    @Default(ChapterDownloadState.pending) ChapterDownloadState downloadState,
-    @Default(true) bool isSelected,
-  }) = _ChapterState;
-
-  ChapterDownloadState get downloadDisplayState {
+  ChapterDownloadState downloadDisplayState(ChapterDownloadState state) {
     if (chapter.content != null) {
       return ChapterDownloadState.complete;
     } else if (!isSelected) {
       return ChapterDownloadState.unselected;
     }
 
-    return downloadState;
+    return state;
   }
 
   bool get shouldDownload => isSelected && chapter.content == null;
 
-  ChapterState copy({
-    ChapterDownloadState? downloadState,
+  ChapterState copyWith({
+    Volume? volume,
+    Chapter? chapter,
     bool? isSelected,
   }) {
     return ChapterState(
-      chapter,
-      downloadState: downloadState ?? this.downloadState,
+      volume ?? this.volume,
+      chapter ?? this.chapter,
       isSelected: isSelected ?? this.isSelected,
     );
-  }
-}
-
-class ChapterNotifier extends StateNotifier<ChapterState> {
-  ChapterNotifier(ChapterState state) : super(state);
-
-  void toggle(bool? value) {
-    state = state.copy(isSelected: value ?? true);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_state.dart';
+import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -104,18 +105,25 @@ class ChapterTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chapter = ref.watch(chapterProvider);
-    final chapterState = ref.watch(chapterStateProvider(chapter));
+    print('build tile');
+
+    final chapterState = ref.watch(chapterProvider);
+    final chapter = chapterState.chapter;
+    final chapterDownloadState =
+        ref.watch(chapterDownloadStateProvider(chapter.index));
+    final isDownloading = ref.watch(isDownloadingProvider);
 
     return CheckboxListTile(
       title: Text(chapter.title),
       subtitle: Text(chapter.updated?.toString() ?? '<unknown>'),
-      secondary: Icon(tileIcon(chapterState.downloadDisplayState)),
+      secondary: Icon(
+          tileIcon(chapterState.downloadDisplayState(chapterDownloadState))),
       value: chapterState.isSelected,
-      onChanged: (value) =>
-          ref.read(chapterStateProvider(chapter).notifier).toggle(value),
-      // onChanged: (value) =>
-      //     ref.read(chapterListProvider.notifier).toggle(chapter.index, value),
+      onChanged: isDownloading
+          ? null
+          : (value) => ref
+              .read(chapterListProvider.notifier)
+              .toggle(chapter.index, value),
     );
 
     // false

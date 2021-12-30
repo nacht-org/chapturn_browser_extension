@@ -24,7 +24,7 @@ abstract class DownloadState with _$DownloadState {
 }
 
 class DownloadNotifier extends StateNotifier<DownloadState> {
-  DownloadNotifier(this.read, this.pending)
+  DownloadNotifier(this.read, this.crawler, this.pending)
       : super(
           pending.isEmpty
               ? const DownloadState.complete()
@@ -32,6 +32,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         );
 
   final List<ChapterState> pending;
+  final NovelCrawler crawler;
   final Reader read;
 
   Future<void> start() async {
@@ -49,6 +50,8 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         chapter.chapter.index,
         ChapterDownloadState.inProgress,
       );
+
+      await crawler.parseChapter(chapter.chapter);
 
       downloadStates.setState(
         chapter.chapter.index,

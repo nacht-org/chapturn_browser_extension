@@ -20,6 +20,11 @@ final crawlerNotifierProvider =
 final crawlerDataProvider =
     Provider<DataCrawlerState>((ref) => throw UnimplementedError());
 
+final crawlerInstanceProvider = Provider<NovelCrawler>(
+  (ref) => ref.watch(crawlerDataProvider).crawler,
+  dependencies: [crawlerDataProvider],
+);
+
 final chapterListProvider =
     StateNotifierProvider<ChapterList, List<VolumeState>>(
   (ref) {
@@ -104,9 +109,17 @@ final chapterDownloadStateProvider =
 final downloadNotifierProvider =
     StateNotifierProvider<DownloadNotifier, DownloadState>(
   (ref) {
-    return DownloadNotifier(ref.read, ref.watch(pendingProvider));
+    return DownloadNotifier(
+      ref.read,
+      ref.watch(crawlerInstanceProvider),
+      ref.watch(pendingProvider),
+    );
   },
-  dependencies: [pendingProvider, downloadStatesProvider.notifier],
+  dependencies: [
+    pendingProvider,
+    crawlerInstanceProvider,
+    downloadStatesProvider.notifier
+  ],
 );
 
 final isDownloadingProvider = Provider<bool>(

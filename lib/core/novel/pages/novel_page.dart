@@ -1,10 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:chapturn_browser_extension/core/novel/notifiers/novel_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:provider/provider.dart';
 
 import '../../../constants/widget_constants.dart';
 import '../../../widgets/key_value_tile.dart';
@@ -55,6 +53,8 @@ class FetchingView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const LoadingCard(heading: 'Fetching...'),
+          const SizedBox(height: cNormalPadding),
           ModalCard(
             heading: uri.host,
             headingIcon: const Icon(Icons.web_asset),
@@ -66,8 +66,6 @@ class FetchingView extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: cNormalPadding),
-          const LoadingCard(heading: 'Fetching...'),
         ],
       ),
     );

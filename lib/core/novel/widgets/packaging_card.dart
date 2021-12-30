@@ -16,21 +16,13 @@ class PackagingCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Text('Downloading & Packaging',
-                style: Theme.of(context).textTheme.headline6),
+            child: Text(
+              'Downloading & Packaging',
+              style: Theme.of(context).textTheme.headline6,
+            ),
           ),
           const DownloadTile(),
-          // Selector<NovelModel, PackagingState>(
-          //   selector: (context, notifier) => notifier.packagingState,
-          //   builder: (context, state, child) {
-          //     return ListTile(
-          //       title: const Text('Package'),
-          //       subtitle: Text(state.message),
-          //       leading: const Icon(Icons.book),
-          //       onTap: _model.packEpub,
-          //     );
-          //   },
-          // ),
+          const PackagingTile(),
           const SizedBox(height: 12),
         ],
       ),
@@ -49,7 +41,7 @@ class DownloadTile extends ConsumerWidget {
       idle: (state) => buildTile(ref, state, 'Idle'),
       pending: (state) => buildTile(ref, state, '${state.count} pending'),
       progress: (state) =>
-          buildTile(ref, state, '${state.progress} of ${state.total} left'),
+          buildTile(ref, state, '${state.progress} of ${state.total}'),
       complete: (state) => buildTile(ref, state, 'Complete'),
     );
   }
@@ -68,6 +60,31 @@ class DownloadTile extends ConsumerWidget {
       onTap: state is PendingDownloadState
           ? ref.read(downloadNotifierProvider.notifier).start
           : null,
+    );
+  }
+}
+
+class PackagingTile extends ConsumerWidget {
+  const PackagingTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final packagingState = ref.watch(packagingProvider);
+
+    return packagingState.map(
+      idle: (state) => buildTile(ref, 'Idle'),
+      waiting: (state) => buildTile(ref, 'Waiting'),
+      busy: (state) => buildTile(ref, 'Busy'),
+      preparing: (state) => buildTile(ref, 'Preparing'),
+    );
+  }
+
+  Widget buildTile(WidgetRef ref, String message) {
+    return ListTile(
+      title: const Text('Package'),
+      subtitle: Text(message),
+      leading: const Icon(Icons.book),
+      onTap: () => ref.read(packagingProvider.notifier).package(),
     );
   }
 }

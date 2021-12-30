@@ -1,3 +1,4 @@
+import 'package:chapturn_browser_extension/core/novel/notifiers/packaging_notifier.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -125,6 +126,24 @@ final downloadNotifierProvider =
 final isDownloadingProvider = Provider<bool>(
   (ref) => ref.watch(downloadNotifierProvider) is ProgressDownloadState,
   dependencies: [downloadNotifierProvider],
+);
+
+final packagingProvider =
+    StateNotifierProvider<PackagingNotifer, PackagingState>(
+  (ref) {
+    return PackagingNotifer(
+      ref.read,
+      ref.watch(crawlerDataProvider).novel,
+      ref.watch(packagerServiceProvider),
+      ref.watch(pendingProvider).isNotEmpty,
+    );
+  },
+  dependencies: [
+    crawlerDataProvider,
+    pendingProvider,
+    packagerServiceProvider,
+    downloadNotifierProvider.notifier
+  ],
 );
 
 /// should be overriden when building chapter list

@@ -1,4 +1,3 @@
-import 'package:chapturn_browser_extension/core/novel/models/indexed.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -46,7 +45,15 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
 
     // final _pending = [...pending];
     for (var chapter in pending) {
-      await Future.delayed(const Duration(seconds: 1));
+      downloadStates.setState(
+        chapter.chapter.index,
+        ChapterDownloadState.inProgress,
+      );
+
+      downloadStates.setState(
+        chapter.chapter.index,
+        ChapterDownloadState.complete,
+      );
 
       state = DownloadState.progress(
         (state as ProgressDownloadState).progress + 1,

@@ -15,7 +15,11 @@ class CrawlerState with _$CrawlerState {
     Meta meta,
   ) = FetchingCrawlerState;
 
-  const factory CrawlerState.data(Meta meta, Novel novel) = DataCrawlerState;
+  const factory CrawlerState.data(
+    Meta meta,
+    NovelCrawler crawler,
+    Novel novel,
+  ) = DataCrawlerState;
 
   const factory CrawlerState.unsupported(
     String url, [
@@ -50,9 +54,10 @@ class CrawlerNotifier extends StateNotifier<CrawlerState> {
 
     state = CrawlerState.fetching(url, meta);
 
-    final novel = await item.create().parseNovel(url);
+    final crawler = item.create();
+    final novel = await crawler.parseNovel(url);
 
-    state = CrawlerState.data(meta, novel);
+    state = CrawlerState.data(meta, crawler, novel);
   }
 
   Future<void> loadNovel() async {}

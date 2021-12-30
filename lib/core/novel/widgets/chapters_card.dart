@@ -105,8 +105,6 @@ class ChapterTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('build tile');
-
     final chapterState = ref.watch(chapterProvider);
     final chapter = chapterState.chapter;
     final chapterDownloadState =

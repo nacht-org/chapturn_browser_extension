@@ -28,9 +28,10 @@ class _$CrawlerStateTearOff {
     );
   }
 
-  DataCrawlerState data(Meta meta, Novel novel) {
+  DataCrawlerState data(Meta meta, NovelCrawler crawler, Novel novel) {
     return DataCrawlerState(
       meta,
+      crawler,
       novel,
     );
   }
@@ -58,7 +59,8 @@ mixin _$CrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) =>
@@ -67,7 +69,7 @@ mixin _$CrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) =>
@@ -76,7 +78,7 @@ mixin _$CrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),
@@ -171,7 +173,8 @@ class _$LoadingCrawlerState implements LoadingCrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) {
@@ -183,7 +186,7 @@ class _$LoadingCrawlerState implements LoadingCrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) {
@@ -195,7 +198,7 @@ class _$LoadingCrawlerState implements LoadingCrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),
@@ -329,7 +332,8 @@ class _$FetchingCrawlerState implements FetchingCrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) {
@@ -341,7 +345,7 @@ class _$FetchingCrawlerState implements FetchingCrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) {
@@ -353,7 +357,7 @@ class _$FetchingCrawlerState implements FetchingCrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),
@@ -421,7 +425,7 @@ abstract class $DataCrawlerStateCopyWith<$Res> {
   factory $DataCrawlerStateCopyWith(
           DataCrawlerState value, $Res Function(DataCrawlerState) then) =
       _$DataCrawlerStateCopyWithImpl<$Res>;
-  $Res call({Meta meta, Novel novel});
+  $Res call({Meta meta, NovelCrawler crawler, Novel novel});
 }
 
 /// @nodoc
@@ -438,6 +442,7 @@ class _$DataCrawlerStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? meta = freezed,
+    Object? crawler = freezed,
     Object? novel = freezed,
   }) {
     return _then(DataCrawlerState(
@@ -445,6 +450,10 @@ class _$DataCrawlerStateCopyWithImpl<$Res>
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
               as Meta,
+      crawler == freezed
+          ? _value.crawler
+          : crawler // ignore: cast_nullable_to_non_nullable
+              as NovelCrawler,
       novel == freezed
           ? _value.novel
           : novel // ignore: cast_nullable_to_non_nullable
@@ -456,16 +465,18 @@ class _$DataCrawlerStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$DataCrawlerState implements DataCrawlerState {
-  const _$DataCrawlerState(this.meta, this.novel);
+  const _$DataCrawlerState(this.meta, this.crawler, this.novel);
 
   @override
   final Meta meta;
+  @override
+  final NovelCrawler crawler;
   @override
   final Novel novel;
 
   @override
   String toString() {
-    return 'CrawlerState.data(meta: $meta, novel: $novel)';
+    return 'CrawlerState.data(meta: $meta, crawler: $crawler, novel: $novel)';
   }
 
   @override
@@ -474,6 +485,7 @@ class _$DataCrawlerState implements DataCrawlerState {
         (other.runtimeType == runtimeType &&
             other is DataCrawlerState &&
             const DeepCollectionEquality().equals(other.meta, meta) &&
+            const DeepCollectionEquality().equals(other.crawler, crawler) &&
             const DeepCollectionEquality().equals(other.novel, novel));
   }
 
@@ -481,6 +493,7 @@ class _$DataCrawlerState implements DataCrawlerState {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(meta),
+      const DeepCollectionEquality().hash(crawler),
       const DeepCollectionEquality().hash(novel));
 
   @JsonKey(ignore: true)
@@ -493,11 +506,12 @@ class _$DataCrawlerState implements DataCrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) {
-    return data(meta, novel);
+    return data(meta, crawler, novel);
   }
 
   @override
@@ -505,11 +519,11 @@ class _$DataCrawlerState implements DataCrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) {
-    return data?.call(meta, novel);
+    return data?.call(meta, crawler, novel);
   }
 
   @override
@@ -517,13 +531,13 @@ class _$DataCrawlerState implements DataCrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),
   }) {
     if (data != null) {
-      return data(meta, novel);
+      return data(meta, crawler, novel);
     }
     return orElse();
   }
@@ -570,9 +584,11 @@ class _$DataCrawlerState implements DataCrawlerState {
 }
 
 abstract class DataCrawlerState implements CrawlerState {
-  const factory DataCrawlerState(Meta meta, Novel novel) = _$DataCrawlerState;
+  const factory DataCrawlerState(Meta meta, NovelCrawler crawler, Novel novel) =
+      _$DataCrawlerState;
 
   Meta get meta;
+  NovelCrawler get crawler;
   Novel get novel;
   @JsonKey(ignore: true)
   $DataCrawlerStateCopyWith<DataCrawlerState> get copyWith =>
@@ -657,7 +673,8 @@ class _$UnsupportedCrawlerState implements UnsupportedCrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) {
@@ -669,7 +686,7 @@ class _$UnsupportedCrawlerState implements UnsupportedCrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) {
@@ -681,7 +698,7 @@ class _$UnsupportedCrawlerState implements UnsupportedCrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),
@@ -811,7 +828,8 @@ class _$ErrorCrawlerState implements ErrorCrawlerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(String url, Meta meta) fetching,
-    required TResult Function(Meta meta, Novel novel) data,
+    required TResult Function(Meta meta, NovelCrawler crawler, Novel novel)
+        data,
     required TResult Function(String url, Meta? meta) unsupported,
     required TResult Function(Exception err) error,
   }) {
@@ -823,7 +841,7 @@ class _$ErrorCrawlerState implements ErrorCrawlerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
   }) {
@@ -835,7 +853,7 @@ class _$ErrorCrawlerState implements ErrorCrawlerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(String url, Meta meta)? fetching,
-    TResult Function(Meta meta, Novel novel)? data,
+    TResult Function(Meta meta, NovelCrawler crawler, Novel novel)? data,
     TResult Function(String url, Meta? meta)? unsupported,
     TResult Function(Exception err)? error,
     required TResult orElse(),

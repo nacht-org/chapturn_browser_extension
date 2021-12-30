@@ -1,18 +1,18 @@
+import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:chapturn_browser_extension/utils/helpers/text_helper.dart';
 import 'package:chapturn_sources/chapturn_sources.dart' as sources;
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
 
-import '../models/novel_model.dart';
-
-class AboutNovelCard extends StatelessWidget {
+class AboutNovelCard extends ConsumerWidget {
   const AboutNovelCard({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var novel = context.select<NovelModel, sources.Novel?>((n) => n.novel)!;
+  Widget build(BuildContext context, WidgetRef ref) {
+    var novel = ref.watch(crawlerDataProvider.select((value) => value.novel));
 
     return Card(
       child: Padding(

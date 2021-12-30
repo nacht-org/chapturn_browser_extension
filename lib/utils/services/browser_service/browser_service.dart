@@ -37,7 +37,7 @@ class BrowserServiceDev implements BrowserService {
 
   @override
   Future<String> get href async =>
-      'https://www.webnovel.com/book/cultivating-disciples-to-breakthrough_19477270406566505';
+      'https://www.scribblehub.com/series/414739/the-swordmaster-and-the-new-god/';
 
   @override
   Future<void> openTabWindow() async {}

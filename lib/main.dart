@@ -1,16 +1,13 @@
 import 'package:chapturn_browser_extension/constants/widget_constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
-import 'package:provider/provider.dart';
 
-import 'core/alert/models/alert_model.dart';
 import 'core/alert/widgets/alert_listener.dart';
-import 'core/novel/models/crawler_model.dart';
 import 'core/novel/pages/novel_page.dart';
 import 'utils/injection.dart';
 import 'utils/services/browser_service/browser_service.dart';
-import 'utils/services/package_service.dart';
 
 void main() {
   configureInjection(kReleaseMode ? Environment.prod : Environment.dev);
@@ -28,32 +25,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AlertModel(),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => CrawlerModel(
-              alert: context.read<AlertModel>(),
-              packager: getIt.get<Packager>(instanceName: 'EpubPackager'),
-              browser: getIt.get<BrowserService>(),
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Chapturn Extension',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          cardTheme: CardTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(cRadius),
             ),
           ),
-        ],
-        child: MaterialApp(
-          title: 'Chapturn Extension',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            cardTheme: CardTheme(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(cRadius),
-              ),
-            ),
-          ),
-          home: const Home(),
-          debugShowCheckedModeBanner: false,
         ),
+        home: const Home(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

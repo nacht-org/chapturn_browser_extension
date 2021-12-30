@@ -1,36 +1,32 @@
-import 'package:chapturn_browser_extension/core/alert/models/alert_model.dart';
+import 'package:chapturn_browser_extension/core/alert/notifiers/alert_notifier.dart';
+import 'package:chapturn_browser_extension/core/alert/providers.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 
-class AlertListener extends StatelessWidget {
+class AlertListener extends ConsumerWidget {
   const AlertListener({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return Selector<AlertModel, Alert?>(
-      builder: (context, value, child) {
-        if (value != null) {
-          WidgetsBinding.instance?.addPostFrameCallback((_) {
-            _handleError(context, value);
-          });
-        }
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AlertState>(alertProvider, (previous, next) {
+      next.map(
+        initial: (state) {},
+        snackbar: (state) => _handleAlert(context, state.message, state.error),
+      );
+    });
 
-        return child!;
-      },
-      selector: (context, notifier) => notifier.alert,
-      child: child,
-    );
+    return child;
   }
 
-  void _handleError(BuildContext context, Alert alert) {
+  void _handleAlert(BuildContext context, String message, bool error) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(alert.message),
+          content: Text(message),
           behavior: SnackBarBehavior.floating,
           width: math.min(MediaQuery.of(context).size.width, 400),
         ),

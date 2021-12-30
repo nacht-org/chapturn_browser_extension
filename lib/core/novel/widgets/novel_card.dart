@@ -1,19 +1,21 @@
+import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../constants/widget_constants.dart';
-import '../models/novel_model.dart';
 
-class NovelCard extends StatelessWidget {
+class NovelCard extends ConsumerWidget {
   const NovelCard({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var model = context.read<NovelModel>();
-    var novel = context.select<NovelModel, Novel?>((model) => model.novel)!;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final crawlerNotifier = ref.read(crawlerNotifierProvider.notifier);
+    final crawlerData = ref.watch(crawlerDataProvider);
+
+    final novel = crawlerData.novel;
 
     return SizedBox(
       height: 340,
@@ -52,7 +54,7 @@ class NovelCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.headline5,
                         ),
                         IconButton(
-                          onPressed: model.reloadNovel,
+                          onPressed: crawlerNotifier.reload,
                           icon: const Icon(Icons.refresh),
                           tooltip: 'Reload novel',
                           splashRadius: cSplashRadius,

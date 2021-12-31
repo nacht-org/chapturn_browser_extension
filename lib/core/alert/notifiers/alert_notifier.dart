@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'alert_notifier.freezed.dart';
 
 @freezed
-abstract class AlertState with _$AlertState {
+class AlertState with _$AlertState {
   const factory AlertState.initial() = _Initial;
   const factory AlertState.snackbar(
     String message, [

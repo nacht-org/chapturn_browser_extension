@@ -1,7 +1,6 @@
 import 'dart:convert' as convert;
 
 import 'package:chapturn_sources/chapturn_Sources.dart' hide Namespace;
-import 'package:injectable/injectable.dart';
 import 'package:path/path.dart' as path;
 import 'package:epublib/epublib.dart';
 import '../helpers/epub_helper.dart';
@@ -11,8 +10,6 @@ abstract class Packager {
   Future<List<int>?> package(Novel novel, {List<int>? thumbnailBytes});
 }
 
-@named
-@Injectable(as: Packager)
 class EpubPackager implements Packager {
   @override
   String get name => 'Epub';

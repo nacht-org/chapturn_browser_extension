@@ -1,3 +1,4 @@
+import 'package:chapturn_browser_extension/core/alert/providers.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -39,6 +40,8 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     if (state is! PendingDownloadState) {
       return;
     }
+
+    read(alertProvider.notifier).showAlert("Download started");
 
     state = DownloadState.progress(0, pending.length);
 

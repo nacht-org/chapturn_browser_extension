@@ -1,18 +1,17 @@
 import 'package:chapturn_browser_extension/constants/widget_constants.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chapturn_browser_extension/utils/services/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:injectable/injectable.dart';
 
 import 'core/alert/widgets/alert_listener.dart';
 import 'core/novel/pages/novel_page.dart';
-import 'utils/injection.dart';
 import 'utils/services/browser_service/browser_service.dart';
 
 void main() {
-  configureInjection(kReleaseMode ? Environment.prod : Environment.dev);
+  final container = ProviderContainer();
+  final browser = container.read(browserServiceProvider);
+  container.dispose();
 
-  final browser = getIt.get<BrowserService>();
   if (browser.runtimeMode == BrowserRuntimeMode.popup) {
     browser.openTabWindow();
   } else {

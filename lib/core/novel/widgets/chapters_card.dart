@@ -109,7 +109,7 @@ class ChapterTile extends ConsumerWidget {
     final chapter = chapterState.chapter;
     final chapterDownloadState =
         ref.watch(chapterDownloadStateProvider(chapter.index));
-    final isDownloading = ref.watch(isDownloadingProvider);
+    final isDownloading = ref.watch(isTaskRunningProvider);
 
     return CheckboxListTile(
       title: Text(chapter.title),

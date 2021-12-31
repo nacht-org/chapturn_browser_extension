@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'enums.dart';
 
 import 'browser_service_web.dart'
@@ -16,8 +15,6 @@ abstract class BrowserService {
   Future<void> openTabWindow();
 }
 
-@Environment(Environment.prod)
-@Injectable(as: BrowserService)
 class BrowserServiceProd implements BrowserService {
   @override
   BrowserRuntimeMode get runtimeMode => pRuntimeMode();
@@ -29,15 +26,13 @@ class BrowserServiceProd implements BrowserService {
   Future<void> openTabWindow() => pOpenTabWindow();
 }
 
-@Environment(Environment.dev)
-@Injectable(as: BrowserService)
 class BrowserServiceDev implements BrowserService {
   @override
   BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.tab;
 
   @override
   Future<String> get href async =>
-      'https://www.scribblehub.com/series/414739/the-swordmaster-and-the-new-god/';
+      'https://www.scribblehub.com/series/397009/sadistic-player-in-a-fantasy-game-world/';
 
   @override
   Future<void> openTabWindow() async {}

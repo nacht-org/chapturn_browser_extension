@@ -41,8 +41,6 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
       return;
     }
 
-    read(alertProvider.notifier).showAlert("Download started");
-
     state = DownloadState.progress(0, pending.length);
 
     final downloadStates = read(downloadStatesProvider.notifier);
@@ -61,12 +59,14 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         ChapterDownloadState.complete,
       );
 
+      if (!mounted) return;
       state = DownloadState.progress(
         (state as ProgressDownloadState).progress + 1,
         pending.length,
       );
     }
 
+    if (!mounted) return;
     state = const DownloadState.complete();
   }
 }

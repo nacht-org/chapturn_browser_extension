@@ -62,8 +62,18 @@ class CrawlerNotifier extends StateNotifier<CrawlerState> {
 
   Future<void> loadNovel() async {}
 
-  // TODO: implement
-  Future<void> reload() async {}
+  Future<void> reload() async {
+    if (state is! DataCrawlerState) {
+      return;
+    }
+
+    state = CrawlerState.fetching(
+      (state as DataCrawlerState).novel.url,
+      (state as DataCrawlerState).meta,
+    );
+
+    await load();
+  }
 
   /// Source has no support or has support but not for browser platform
   bool isNotSupported(Support support) {

@@ -120,7 +120,6 @@ final downloadNotifierProvider =
   dependencies: [
     pendingProvider,
     crawlerInstanceProvider,
-    alertProvider.notifier,
     downloadStatesProvider.notifier
   ],
 );

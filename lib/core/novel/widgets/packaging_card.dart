@@ -40,8 +40,14 @@ class DownloadTile extends ConsumerWidget {
     return downloadState.map(
       idle: (state) => buildTile(ref, state, 'Idle'),
       pending: (state) => buildTile(ref, state, '${state.count} pending'),
-      progress: (state) =>
-          buildTile(ref, state, '${state.progress} of ${state.total}'),
+      progress: (state) => buildTile(
+        ref,
+        state,
+        'Progress: ${state.progress} of ${state.total}',
+        trailing: CircularProgressIndicator(
+          value: state.progress / state.total,
+        ),
+      ),
       complete: (state) => buildTile(ref, state, 'Complete'),
     );
   }
@@ -49,14 +55,14 @@ class DownloadTile extends ConsumerWidget {
   Widget buildTile(
     WidgetRef ref,
     DownloadState state,
-    String status, [
-    Icon? icon,
-  ]) {
+    String status, {
+    Widget? trailing,
+  }) {
     return ListTile(
       title: const Text('Download'),
       subtitle: Text(status),
       leading: const Icon(Icons.download),
-      trailing: icon,
+      trailing: trailing,
       onTap: state is PendingDownloadState
           ? ref.read(downloadNotifierProvider.notifier).start
           : null,
@@ -70,21 +76,25 @@ class PackagingTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final packagingState = ref.watch(packagingProvider);
+    final isTaskRunning = ref.watch(isTaskRunningProvider);
 
     return packagingState.map(
-      idle: (state) => buildTile(ref, 'Idle'),
-      waiting: (state) => buildTile(ref, 'Waiting'),
-      busy: (state) => buildTile(ref, 'Busy'),
-      preparing: (state) => buildTile(ref, 'Preparing'),
+      idle: (state) => buildTile(ref, 'Idle', disabled: isTaskRunning),
+      waiting: (state) => buildTile(ref, 'Waiting', disabled: isTaskRunning),
+      busy: (state) => buildTile(ref, 'Busy', disabled: isTaskRunning),
+      preparing: (state) =>
+          buildTile(ref, 'Preparing', disabled: isTaskRunning),
     );
   }
 
-  Widget buildTile(WidgetRef ref, String message) {
+  Widget buildTile(WidgetRef ref, String message, {bool disabled = false}) {
     return ListTile(
       title: const Text('Package'),
       subtitle: Text(message),
       leading: const Icon(Icons.book),
-      onTap: () => ref.read(packagingProvider.notifier).package(),
+      onTap: disabled
+          ? null
+          : () => ref.read(packagingProvider.notifier).package(),
     );
   }
 }

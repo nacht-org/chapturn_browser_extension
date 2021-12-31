@@ -38,6 +38,7 @@ class PackagingNotifer extends StateNotifier<PackagingState> {
 
     Uint8List? thumbnail = await _thumbnail();
 
+    if (!mounted) return;
     state = const PackagingState.waiting();
     final bytes = await _package(novel, thumbnail);
 
@@ -47,15 +48,17 @@ class PackagingNotifer extends StateNotifier<PackagingState> {
       print('Failed to package: epub is null');
     }
 
+    if (!mounted) return;
     state = const PackagingState.idle();
   }
 
   Future<Uint8List?> _thumbnail() async {
     Uint8List? bytes;
     if (novel.thumbnailUrl != null) {
+      if (!mounted) return null;
       state = const PackagingState.preparing();
 
-      final response = await http.get(Uri.parse(novel!.thumbnailUrl!));
+      final response = await http.get(Uri.parse(novel.thumbnailUrl!));
       bytes = response.bodyBytes;
     }
 

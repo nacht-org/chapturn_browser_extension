@@ -7,6 +7,8 @@ class DownloadStatesNotifier
   DownloadStatesNotifier(Map<int, ChapterDownloadState> state) : super(state);
 
   void setState(int index, ChapterDownloadState downloadState) {
+    if (!mounted) return;
+
     state = Map.fromEntries(
       state.entries.map(
         (e) => MapEntry(e.key, e.key == index ? downloadState : e.value),

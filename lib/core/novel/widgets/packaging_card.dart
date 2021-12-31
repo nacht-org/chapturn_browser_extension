@@ -40,14 +40,8 @@ class DownloadTile extends ConsumerWidget {
     return downloadState.map(
       idle: (state) => buildTile(ref, state, 'Idle'),
       pending: (state) => buildTile(ref, state, '${state.count} pending'),
-      progress: (state) => buildTile(
-        ref,
-        state,
-        'Progress: ${state.progress} of ${state.total}',
-        trailing: CircularProgressIndicator(
-          value: state.progress / state.total,
-        ),
-      ),
+      progress: (state) => buildTile(ref, state,
+          '${state.progress} of ${state.total}', const Icon(Icons.downloading)),
       complete: (state) => buildTile(ref, state, 'Complete'),
     );
   }
@@ -55,9 +49,9 @@ class DownloadTile extends ConsumerWidget {
   Widget buildTile(
     WidgetRef ref,
     DownloadState state,
-    String status, {
+    String status, [
     Widget? trailing,
-  }) {
+  ]) {
     return ListTile(
       title: const Text('Download'),
       subtitle: Text(status),

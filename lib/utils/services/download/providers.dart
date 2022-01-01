@@ -1,16 +1,15 @@
 import 'dart:collection';
 
 import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
-import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'models.dart';
-import 'notifiers.dart';
-import 'types.dart';
+import 'controller.dart';
+import 'list.dart';
+import 'state_map.dart';
 
 /// Controls chapter download states for chapter
-final downloadStateMapController = StateNotifierProvider.autoDispose<
-    DownloadStateMapNotifier, DownloadStateMap>(
+final downloadStateMapController =
+    StateNotifierProvider<DownloadStateMapNotifier, DownloadStateMap>(
   (ref) => DownloadStateMapNotifier({}),
 );
 
@@ -21,15 +20,15 @@ final downloadStateMapController = StateNotifierProvider.autoDispose<
 /// - [ChapterDownloadState.pending] if chapter is not present in downloads
 ///
 /// else the recorded state in [downloadStates]
-final chapterDownloadState = Provider.autoDispose
+final chapterDownloadStateProvider = Provider.autoDispose
     .family<ChapterDownloadState, ChapterState>((ref, state) {
   if (state.chapter.content != null) {
     return const ChapterDownloadState.complete();
-  } else if (state.isSelected) {
+  } else if (!state.isSelected) {
     return const ChapterDownloadState.skip();
   }
 
-  return ref.watch(downloadStateMapController)[state.chapter] ??
+  return ref.watch(downloadStateMapController)[state] ??
       const ChapterDownloadState.pending();
 });
 
@@ -41,7 +40,7 @@ final chapterDownloadState = Provider.autoDispose
 /// must be used with caution.
 ///
 /// Does not rebuild
-final _downloadList = Provider<DownloadList>((ref) => LinkedHashSet());
+final _downloadList = Provider<DownloadList>((ref) => []);
 
 /// [DownloadListController] is used to manipulate [_downloadList]
 ///
@@ -73,6 +72,17 @@ final downloadController =
   ),
 );
 
+/// All downloads currently pending
+final pendingDownloadsProvider = Provider<List<DownloadItem>>((ref) {
+  // only watching if state changes
+  ref.watch(downloadListController);
+
+  return ref
+      .watch(_downloadList)
+      .where((item) => item.chapterState.shouldDownload)
+      .toList();
+});
+
 /// Indicates the actual state of the downloads
 ///
 /// Conditions:
@@ -84,12 +94,14 @@ final downloadController =
 /// Refreshes when states changes of:
 /// - [downloadListController]
 /// - [downloadController]
-final downloadState = Provider<DownloadState>((ref) {
+final downloadStateProvider = Provider<DownloadState>((ref) {
   // only watching if state changes
   ref.watch(downloadListController);
 
   final downloadList = ref.watch(_downloadList);
   final downloadControllerState = ref.watch(downloadController);
+  final pending =
+      ref.watch(pendingDownloadsProvider).map((item) => item.chapterState);
 
   return downloadControllerState.when(
     idle: () {
@@ -97,15 +109,11 @@ final downloadState = Provider<DownloadState>((ref) {
         return const DownloadState.empty();
       }
 
-      final pending = downloadList.where(
-        (chapterState) => chapterState.shouldDownload,
-      );
-
       return pending.isEmpty
           ? const DownloadState.complete()
           : DownloadState.pending(pending);
     },
-    downloading: (value, total) => DownloadState.downloading(value, total),
+    downloading: (value) => DownloadState.downloading(pending.length),
   );
 });
 

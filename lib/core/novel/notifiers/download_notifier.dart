@@ -1,72 +1,72 @@
-import 'package:chapturn_browser_extension/core/alert/providers.dart';
-import 'package:chapturn_browser_extension/core/novel/providers.dart';
-import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+// import 'package:chapturn_browser_extension/core/alert/providers.dart';
+// import 'package:chapturn_browser_extension/core/novel/providers.dart';
+// import 'package:chapturn_sources/chapturn_sources.dart';
+// import 'package:freezed_annotation/freezed_annotation.dart';
+// import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../utils/services/chapter/models.dart';
+// import '../../../utils/services/chapter/models.dart';
 
-part 'download_notifier.freezed.dart';
+// part 'download_notifier.freezed.dart';
 
-enum ChapterDownloadState {
-  pending,
-  unselected,
-  inProgress,
-  complete,
-}
+// enum ChapterDownloadState {
+//   pending,
+//   unselected,
+//   inProgress,
+//   complete,
+// }
 
-@freezed
-abstract class DownloadState with _$DownloadState {
-  const factory DownloadState.idle() = IdleDownloadState;
-  const factory DownloadState.pending(int count) = PendingDownloadState;
-  const factory DownloadState.progress(int progress, int total) =
-      ProgressDownloadState;
-  const factory DownloadState.complete() = CompleteDownloadState;
-}
+// @freezed
+// abstract class DownloadState with _$DownloadState {
+//   const factory DownloadState.idle() = IdleDownloadState;
+//   const factory DownloadState.pending(int count) = PendingDownloadState;
+//   const factory DownloadState.progress(int progress, int total) =
+//       ProgressDownloadState;
+//   const factory DownloadState.complete() = CompleteDownloadState;
+// }
 
-class DownloadNotifier extends StateNotifier<DownloadState> {
-  DownloadNotifier(this.read, this.crawler, this.pending)
-      : super(
-          pending.isEmpty
-              ? const DownloadState.complete()
-              : DownloadState.pending(pending.length),
-        );
+// class DownloadNotifier extends StateNotifier<DownloadState> {
+//   DownloadNotifier(this.read, this.crawler, this.pending)
+//       : super(
+//           pending.isEmpty
+//               ? const DownloadState.complete()
+//               : DownloadState.pending(pending.length),
+//         );
 
-  final List<ChapterState> pending;
-  final NovelCrawler crawler;
-  final Reader read;
+//   final List<ChapterState> pending;
+//   final NovelCrawler crawler;
+//   final Reader read;
 
-  Future<void> start() async {
-    if (state is! PendingDownloadState) {
-      return;
-    }
+//   Future<void> start() async {
+//     if (state is! PendingDownloadState) {
+//       return;
+//     }
 
-    state = DownloadState.progress(0, pending.length);
+//     state = DownloadState.progress(0, pending.length);
 
-    final downloadStates = read(downloadStatesProvider.notifier);
+//     // final downloadStates = read(downloadStatesProvider.notifier);
 
-    // final _pending = [...pending];
-    for (var chapter in pending) {
-      downloadStates.setState(
-        chapter.chapter.index,
-        ChapterDownloadState.inProgress,
-      );
+//     // final _pending = [...pending];
+//     for (var chapter in pending) {
+//       downloadStates.setState(
+//         chapter.chapter.index,
+//         ChapterDownloadState.inProgress,
+//       );
 
-      await crawler.parseChapter(chapter.chapter);
+//       await crawler.parseChapter(chapter.chapter);
 
-      downloadStates.setState(
-        chapter.chapter.index,
-        ChapterDownloadState.complete,
-      );
+//       downloadStates.setState(
+//         chapter.chapter.index,
+//         ChapterDownloadState.complete,
+//       );
 
-      if (!mounted) return;
-      state = DownloadState.progress(
-        (state as ProgressDownloadState).progress + 1,
-        pending.length,
-      );
-    }
+//       if (!mounted) return;
+//       state = DownloadState.progress(
+//         (state as ProgressDownloadState).progress + 1,
+//         pending.length,
+//       );
+//     }
 
-    if (!mounted) return;
-    state = const DownloadState.complete();
-  }
-}
+//     if (!mounted) return;
+//     state = const DownloadState.complete();
+//   }
+// }

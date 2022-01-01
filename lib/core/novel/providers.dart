@@ -1,15 +1,12 @@
-import 'package:chapturn_browser_extension/core/alert/providers.dart';
-import 'package:collection/collection.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/packaging_notifier.dart';
+import 'package:chapturn_browser_extension/utils/services/download/list.dart';
+import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
-import 'package:chapturn_browser_extension/utils/services/providers.dart';
-
-import 'notifiers/chapter_download_states.dart';
+import '../../utils/services/chapter/models.dart';
+import '../../utils/services/providers.dart';
+import '../../utils/shared/option.dart';
 import 'notifiers/chapter_list_notifier.dart';
 import 'notifiers/crawler_notifier.dart';
 
@@ -19,33 +16,55 @@ final crawlerNotifierProvider =
 );
 
 /// should be overriden when data is received
-final crawlerDataProvider =
-    Provider<DataCrawlerState>((ref) => throw UnimplementedError());
+final crawlerDataProvider = Provider<Option<DataCrawlerState>>((ref) {
+  final crawlerState = ref.watch(crawlerNotifierProvider);
 
-final crawlerInstanceProvider = Provider<NovelCrawler>(
-  (ref) => ref.watch(crawlerDataProvider).crawler,
-  dependencies: [crawlerDataProvider],
+  if (crawlerState is DataCrawlerState) {
+    return Option.data(crawlerState);
+  } else {
+    return const Option.none();
+  }
+});
+
+final crawlerInstanceProvider = Provider<Option<NovelCrawler>>(
+  (ref) => ref.watch(crawlerDataProvider).whenData((data) => data.crawler),
 );
 
 final chapterListProvider =
     StateNotifierProvider<ChapterList, List<VolumeState>>(
-  (ref) {
-    return ChapterList(ref.watch(crawlerDataProvider).novel.volumes);
-  },
-  dependencies: [crawlerDataProvider],
+  (ref) => ref.watch(crawlerDataProvider).when(
+        none: () => ChapterList([]),
+        data: (data) => ChapterList(data.novel.volumes),
+      ),
 );
 
 final chapterCountProvider = Provider<int>(
-  (ref) => ref.watch(crawlerDataProvider).novel.chapterCount(),
-  dependencies: [crawlerDataProvider],
+  (ref) => ref.watch(crawlerDataProvider).when(
+        none: () => 0,
+        data: (data) => data.novel.chapterCount(),
+      ),
+);
+
+final selectedChaptersProvider = Provider<List<ChapterState>>(
+  (ref) {
+    return [
+      for (var vs in ref.watch(chapterListProvider))
+        for (var cs in vs.chapters)
+          if (cs.shouldDownload) cs
+    ];
+  },
 );
 
 final isMultiVolumeProvider = Provider<bool>(
   (ref) {
-    final volumes = ref.watch(crawlerDataProvider).novel.volumes;
-    return volumes.length != 1 && volumes.first.index < 0;
+    return ref.watch(crawlerDataProvider).when(
+          none: () => false,
+          data: (data) {
+            final volumes = data.novel.volumes;
+            return volumes.length != 1 && volumes.first.index < 0;
+          },
+        );
   },
-  dependencies: [crawlerDataProvider],
 );
 
 final multiVolumeProvider = Provider<List<ChapterListItem>>(
@@ -62,92 +81,29 @@ final multiVolumeProvider = Provider<List<ChapterListItem>>(
 
     return items;
   },
-  dependencies: [chapterListProvider],
 );
 
 final singleVolumeProvider = Provider<List<ChapterState>>(
   (ref) {
-    return ref.watch(chapterListProvider).first.chapters;
+    final volumes = ref.watch(chapterListProvider);
+    return volumes.isEmpty ? [] : volumes.first.chapters;
   },
-  dependencies: [chapterListProvider],
 );
 
-final pendingProvider = Provider<List<ChapterState>>(
-  (ref) {
-    return [
-      for (var vs in ref.watch(chapterListProvider))
-        for (var cs in vs.chapters)
-          if (cs.shouldDownload) cs
-    ];
-  },
-  dependencies: [chapterListProvider],
-);
+final mixedDownloadStateProvider = Provider<DownloadState>((ref) {
+  final selectedChapters = ref.watch(selectedChaptersProvider);
+  final downloadState = ref.watch(downloadStateProvider);
 
-final downloadStatesProvider = StateNotifierProvider<DownloadStatesNotifier,
-    Map<int, ChapterDownloadState>>(
-  (ref) {
-    final chapterList = ref.watch(chapterListProvider);
+  if (downloadState is Downloading) {
+    return downloadState;
+  }
 
-    final map = <int, ChapterDownloadState>{};
-    for (var vs in chapterList) {
-      for (var cs in vs.chapters) {
-        map[cs.chapter.index] = ChapterDownloadState.pending;
-      }
-    }
-
-    return DownloadStatesNotifier(map);
-  },
-  dependencies: [chapterListProvider],
-);
-
-final chapterDownloadStateProvider =
-    Provider.autoDispose.family<ChapterDownloadState, int>(
-  (ref, index) {
-    return ref.watch(downloadStatesProvider)[index]!;
-  },
-  dependencies: [downloadStatesProvider],
-);
-
-final downloadNotifierProvider =
-    StateNotifierProvider<DownloadNotifier, DownloadState>(
-  (ref) {
-    return DownloadNotifier(
-      ref.read,
-      ref.watch(crawlerInstanceProvider),
-      ref.watch(pendingProvider),
-    );
-  },
-  dependencies: [
-    pendingProvider,
-    crawlerInstanceProvider,
-    downloadStatesProvider.notifier
-  ],
-);
-
-final packagingProvider =
-    StateNotifierProvider<PackagingNotifer, PackagingState>(
-  (ref) {
-    return PackagingNotifer(
-      ref.read,
-      ref.watch(crawlerDataProvider).novel,
-      ref.watch(packagerProvider),
-      ref.watch(pendingProvider).isNotEmpty,
-    );
-  },
-  dependencies: [
-    crawlerDataProvider,
-    pendingProvider,
-    packagerProvider,
-    downloadNotifierProvider.notifier
-  ],
-);
-
-final isTaskRunningProvider = Provider<bool>(
-  (ref) =>
-      ref.watch(downloadNotifierProvider) is ProgressDownloadState ||
-      ref.watch(packagingProvider) is! IdlePackaingState,
-  dependencies: [downloadNotifierProvider, packagingProvider],
-);
+  if (selectedChapters.isEmpty) {
+    return const DownloadState.complete();
+  } else {
+    return DownloadState.pending(selectedChapters);
+  }
+});
 
 /// should be overriden when building chapter list
 final chapterProvider =

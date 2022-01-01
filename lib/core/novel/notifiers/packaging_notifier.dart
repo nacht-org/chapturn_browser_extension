@@ -33,7 +33,7 @@ class PackagingNotifer extends StateNotifier<PackagingState> {
   Future<void> package() async {
     if (hasPending) {
       state = const PackagingState.waiting();
-      await read(downloadNotifierProvider.notifier).start();
+      // await read(downloadNotifierProvider.notifier).start();
     }
 
     Uint8List? thumbnail = await _thumbnail();

@@ -15,7 +15,7 @@ class NovelCard extends ConsumerWidget {
     final crawlerNotifier = ref.read(crawlerNotifierProvider.notifier);
     final crawlerData = ref.watch(crawlerDataProvider);
 
-    final novel = crawlerData.novel;
+    final novel = crawlerData.value!.novel;
 
     return SizedBox(
       height: 340,

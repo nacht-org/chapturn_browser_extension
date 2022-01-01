@@ -13,16 +13,6 @@ class ChapterState {
     this.isSelected = true,
   });
 
-  ChapterDownloadState downloadDisplayState(ChapterDownloadState state) {
-    if (chapter.content != null) {
-      return ChapterDownloadState.complete;
-    } else if (!isSelected) {
-      return ChapterDownloadState.unselected;
-    }
-
-    return state;
-  }
-
   bool get shouldDownload => isSelected && chapter.content == null;
 
   ChapterState copyWith({

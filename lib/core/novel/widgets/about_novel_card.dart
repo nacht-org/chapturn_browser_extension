@@ -12,7 +12,8 @@ class AboutNovelCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var novel = ref.watch(crawlerDataProvider.select((value) => value.novel));
+    var novel =
+        ref.watch(crawlerDataProvider.select((value) => value.value!.novel));
 
     return Card(
       child: Padding(

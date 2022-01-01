@@ -1,6 +1,9 @@
 import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
 import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
+import 'package:chapturn_browser_extension/utils/services/download/list.dart';
+import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
+import 'package:chapturn_browser_extension/utils/services/download/state_map.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
@@ -107,15 +110,13 @@ class ChapterTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final chapterState = ref.watch(chapterProvider);
     final chapter = chapterState.chapter;
-    final chapterDownloadState =
-        ref.watch(chapterDownloadStateProvider(chapter.index));
-    final isDownloading = ref.watch(isTaskRunningProvider);
+    final downloadState = ref.watch(chapterDownloadStateProvider(chapterState));
+    final isDownloading = false;
 
     return CheckboxListTile(
       title: Text(chapter.title),
       subtitle: Text(chapter.updated?.toString() ?? '<unknown>'),
-      secondary: Icon(
-          tileIcon(chapterState.downloadDisplayState(chapterDownloadState))),
+      secondary: Icon(tileIcon(downloadState)),
       value: chapterState.isSelected,
       onChanged: isDownloading
           ? null
@@ -132,15 +133,16 @@ class ChapterTile extends ConsumerWidget {
   }
 
   IconData tileIcon(ChapterDownloadState state) {
-    switch (state) {
-      case ChapterDownloadState.pending:
-        return Icons.download;
-      case ChapterDownloadState.unselected:
-        return Icons.cancel;
-      case ChapterDownloadState.inProgress:
-        return Icons.downloading;
-      case ChapterDownloadState.complete:
-        return Icons.download_done;
+    if (state is ChapterDownloadPending) {
+      return Icons.download;
+    } else if (state is ChapterDownloadSkip) {
+      return Icons.cancel;
+    } else if (state is ChapterDownloading) {
+      return Icons.downloading;
+    } else if (state is ChapterDownloadComplete) {
+      return Icons.download_done;
+    } else {
+      return Icons.error;
     }
   }
 }

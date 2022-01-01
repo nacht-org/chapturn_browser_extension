@@ -5,7 +5,7 @@ import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_state.dart';
+import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
 import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
 import 'package:chapturn_browser_extension/utils/services/providers.dart';
 

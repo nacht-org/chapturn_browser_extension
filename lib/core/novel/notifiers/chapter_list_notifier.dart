@@ -2,7 +2,7 @@ import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'chapter_state.dart';
+import '../../../utils/services/chapter/models.dart';
 
 part 'chapter_list_notifier.freezed.dart';
 

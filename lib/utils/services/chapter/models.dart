@@ -1,9 +1,6 @@
 import 'package:chapturn_sources/chapturn_sources.dart';
-import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'download_notifier.dart';
+import '../../../core/novel/notifiers/download_notifier.dart';
 
 class ChapterState {
   final Volume volume;

@@ -1,4 +1,4 @@
-import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_state.dart';
+import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
 import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
 import 'package:flutter/material.dart';

@@ -57,7 +57,7 @@ class NovelCard extends ConsumerWidget {
                           onPressed: crawlerNotifier.reload,
                           icon: const Icon(Icons.refresh),
                           tooltip: 'Reload novel',
-                          splashRadius: cSplashRadius,
+                          splashRadius: kSplashRadius,
                         ),
                       ],
                     ),

@@ -50,14 +50,14 @@ class FetchingView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const LoadingCard(heading: 'Fetching...'),
-          const SizedBox(height: cNormalPadding),
+          const SizedBox(height: kNormalPadding),
           ModalCard(
             heading: uri.host,
             headingIcon: const Icon(Icons.web_asset),
             children: [
               KeyValueTile('Path', uri.path),
               if (uri.hasQuery) ...[
-                const SizedBox(height: cContentPadding),
+                const SizedBox(height: kContentPadding),
                 KeyValueTile('Query', uri.query),
               ],
             ],
@@ -88,14 +88,14 @@ class CrawlerLoadedView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: const [
                   NovelCard(),
-                  SizedBox(height: cNormalPadding),
+                  SizedBox(height: kNormalPadding),
                   PackagingCard(),
-                  SizedBox(height: cNormalPadding),
+                  SizedBox(height: kNormalPadding),
                   ChaptersCard()
                 ],
               ),
             ),
-            const SizedBox(width: cNormalPadding),
+            const SizedBox(width: kNormalPadding),
             Expanded(
               flex: 3,
               child: Column(

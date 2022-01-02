@@ -29,10 +29,9 @@ class MyApp extends StatelessWidget {
         title: 'Chapturn Extension',
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
           cardTheme: CardTheme(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(cRadius),
+              borderRadius: BorderRadius.circular(kRadius),
             ),
           ),
         ),

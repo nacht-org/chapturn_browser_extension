@@ -18,7 +18,7 @@ class ModalCard extends StatelessWidget {
   static Widget forceCentered({required Widget child, double? width}) {
     return Center(
       child: SizedBox(
-        width: width ?? cPreferredCardWidth,
+        width: width ?? kPreferredCardWidth,
         child: child,
       ),
     );
@@ -29,11 +29,11 @@ class ModalCard extends StatelessWidget {
     final hasMiddle = children != null;
     final hasBottom = actions != null;
 
-    const divider = Divider(height: cNormalPadding * 2);
+    const divider = Divider(height: kNormalPadding * 2);
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(cNormalPadding),
+        padding: const EdgeInsets.all(kNormalPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +55,7 @@ class ModalCard extends StatelessWidget {
               ...children!,
             ],
             if (hasBottom) ...[
-              const SizedBox(height: cNormalPadding),
+              const SizedBox(height: kNormalPadding),
               Row(
                 children: actions!,
               ),

@@ -16,7 +16,6 @@ final crawlerController =
   (ref) => CrawlerController(browser: ref.watch(browserServiceProvider)),
 );
 
-/// should be overriden when data is received
 final crawlerDataProvider = Provider<Option<DataCrawlerState>>((ref) {
   final crawlerState = ref.watch(crawlerController);
 

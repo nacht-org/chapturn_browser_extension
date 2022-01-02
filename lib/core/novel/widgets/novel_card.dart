@@ -12,7 +12,7 @@ class NovelCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final crawlerNotifier = ref.read(crawlerNotifierProvider.notifier);
+    final crawlerNotifier = ref.read(crawlerController.notifier);
     final crawlerData = ref.watch(crawlerDataProvider);
 
     final novel = crawlerData.value!.novel;

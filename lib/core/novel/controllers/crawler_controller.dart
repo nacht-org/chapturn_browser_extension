@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../utils/services/browser_service/browser_service.dart';
 
-part 'crawler_notifier.freezed.dart';
+part 'crawler_controller.freezed.dart';
 
 @freezed
 class CrawlerState with _$CrawlerState {
@@ -29,8 +29,8 @@ class CrawlerState with _$CrawlerState {
   const factory CrawlerState.error(Exception err) = ErrorCrawlerState;
 }
 
-class CrawlerNotifier extends StateNotifier<CrawlerState> {
-  CrawlerNotifier({
+class CrawlerController extends StateNotifier<CrawlerState> {
+  CrawlerController({
     required this.browser,
   }) : super(const CrawlerState.loading()) {
     load();

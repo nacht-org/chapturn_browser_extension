@@ -12,33 +12,36 @@ class AboutNovelCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var novel =
-        ref.watch(crawlerDataProvider.select((value) => value.value!.novel));
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'About this',
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            const SizedBox(height: 12.0),
-            ...buildDescription(context, novel),
-            ...buildGenres(context, novel),
-            ...buildMore(context, novel),
-            // Center(
-            //   child: TextButton(
-            //     onPressed: () {},
-            //     child: const Text('Show More'),
-            //   ),
-            // )
-          ],
-        ),
-      ),
-    );
+    return ref.watch(crawlerDataProvider).when(
+          none: () => const SizedBox(),
+          data: (value) {
+            final novel = value.novel;
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'About this',
+                      style: Theme.of(context).textTheme.headline6,
+                    ),
+                    const SizedBox(height: 12.0),
+                    ...buildDescription(context, novel),
+                    ...buildGenres(context, novel),
+                    ...buildMore(context, novel),
+                    // Center(
+                    //   child: TextButton(
+                    //     onPressed: () {},
+                    //     child: const Text('Show More'),
+                    //   ),
+                    // )
+                  ],
+                ),
+              ),
+            );
+          },
+        );
   }
 
   List<Widget> buildDescription(BuildContext context, sources.Novel novel) {

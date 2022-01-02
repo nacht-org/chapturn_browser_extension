@@ -1,7 +1,5 @@
-import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
+import 'package:chapturn_browser_extension/core/novel/controllers/download_controller.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
-import 'package:chapturn_browser_extension/utils/services/download/list.dart';
-import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -24,7 +22,7 @@ class PackagingCard extends StatelessWidget {
             ),
           ),
           const DownloadTile(),
-          // const PackagingTile(),
+          const PackagingTile(),
           const SizedBox(height: 12),
         ],
       ),
@@ -37,7 +35,7 @@ class DownloadTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final downloadState = ref.watch(mixedDownloadStateProvider);
+    final downloadState = ref.watch(downloadStateProvider);
 
     return downloadState.map(
       empty: (state) => buildTile(ref, state, 'Empty'),
@@ -61,49 +59,36 @@ class DownloadTile extends ConsumerWidget {
       subtitle: Text(status),
       leading: const Icon(Icons.download),
       trailing: trailing,
-      onTap: state is! Downloading ? () => start(ref) : null,
+      onTap: state is! Downloading
+          ? () => ref.watch(downloadController.notifier).start()
+          : null,
     );
-  }
-
-  void start(WidgetRef ref) {
-    // Add selected to download
-    ref.read(downloadListController.notifier)
-      ..clear()
-      ..addAll(
-        ref.watch(crawlerDataProvider).value!.crawler,
-        ref.watch(selectedChaptersProvider),
-      );
-
-    // Start download
-    ref.read(downloadController.notifier).start();
   }
 }
 
-// class PackagingTile extends ConsumerWidget {
-//   const PackagingTile({Key? key}) : super(key: key);
+class PackagingTile extends ConsumerWidget {
+  const PackagingTile({Key? key}) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final packagingState = ref.watch(packagingProvider);
-//     final isTaskRunning = ref.watch(isTaskRunningProvider);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final packagingState = ref.watch(packagingController);
 
-//     return packagingState.map(
-//       idle: (state) => buildTile(ref, 'Idle', disabled: isTaskRunning),
-//       waiting: (state) => buildTile(ref, 'Waiting', disabled: isTaskRunning),
-//       busy: (state) => buildTile(ref, 'Busy', disabled: isTaskRunning),
-//       preparing: (state) =>
-//           buildTile(ref, 'Preparing', disabled: isTaskRunning),
-//     );
-//   }
+    return packagingState.map(
+      idle: (state) => buildTile(ref, 'Idle'),
+      waiting: (state) => buildTile(ref, 'Waiting', disabled: true),
+      busy: (state) => buildTile(ref, 'Busy', disabled: true),
+      preparing: (state) => buildTile(ref, 'Preparing', disabled: true),
+    );
+  }
 
-//   Widget buildTile(WidgetRef ref, String message, {bool disabled = false}) {
-//     return ListTile(
-//       title: const Text('Package'),
-//       subtitle: Text(message),
-//       leading: const Icon(Icons.book),
-//       onTap: disabled
-//           ? null
-//           : () => ref.read(packagingProvider.notifier).package(),
-//     );
-//   }
-// }
+  Widget buildTile(WidgetRef ref, String message, {bool disabled = false}) {
+    return ListTile(
+      title: const Text('Package'),
+      subtitle: Text(message),
+      leading: const Icon(Icons.book),
+      onTap: disabled
+          ? null
+          : () => ref.watch(packagingController.notifier).package(),
+    );
+  }
+}

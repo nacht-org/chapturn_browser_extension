@@ -32,7 +32,7 @@ class BrowserServiceDev implements BrowserService {
 
   @override
   Future<String> get href async =>
-      'https://www.scribblehub.com/series/397009/sadistic-player-in-a-fantasy-game-world/';
+      'https://www.scribblehub.com/series/416025/legendary-side-character/';
 
   @override
   Future<void> openTabWindow() async {}

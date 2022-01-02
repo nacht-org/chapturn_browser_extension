@@ -1,13 +1,7 @@
-import 'package:chapturn_browser_extension/utils/services/chapter/models.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/download_notifier.dart';
+import 'package:chapturn_browser_extension/core/novel/controllers/download_controller.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
-import 'package:chapturn_browser_extension/utils/services/download/list.dart';
-import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
-import 'package:chapturn_browser_extension/utils/services/download/state_map.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 
 class ChaptersCard extends ConsumerWidget {
   const ChaptersCard({
@@ -110,13 +104,12 @@ class ChapterTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final chapterState = ref.watch(chapterProvider);
     final chapter = chapterState.chapter;
-    final downloadState = ref.watch(chapterDownloadStateProvider(chapterState));
     final isDownloading = false;
 
     return CheckboxListTile(
       title: Text(chapter.title),
       subtitle: Text(chapter.updated?.toString() ?? '<unknown>'),
-      secondary: Icon(tileIcon(downloadState)),
+      secondary: Icon(tileIcon(chapterState.displayDownloadState)),
       value: chapterState.isSelected,
       onChanged: isDownloading
           ? null

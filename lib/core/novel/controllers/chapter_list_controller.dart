@@ -2,9 +2,10 @@ import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../utils/services/chapter/models.dart';
+import '../models.dart';
+import 'download_controller.dart';
 
-part 'chapter_list_notifier.freezed.dart';
+part 'chapter_list_controller.freezed.dart';
 
 @freezed
 class ChapterListItem with _$ChapterListItem {
@@ -34,8 +35,8 @@ class VolumeState {
   }
 }
 
-class ChapterList extends StateNotifier<List<VolumeState>> {
-  ChapterList(List<Volume> state)
+class ChapterListController extends StateNotifier<List<VolumeState>> {
+  ChapterListController(List<Volume> state)
       : super(state.map((volume) => VolumeState.from(volume)).toList());
 
   void toggle(int chapterIndex, bool? value) {
@@ -48,6 +49,23 @@ class ChapterList extends StateNotifier<List<VolumeState>> {
             else
               chapter
         ])
+    ];
+  }
+
+  void setDownloadState(
+      ChapterState chapterState, ChapterDownloadState downloadState) {
+    state = [
+      for (var volume in state)
+        if (volume.volume == chapterState.volume)
+          volume.copyWith(chapters: [
+            for (var chapter in volume.chapters)
+              if (chapter.chapter.index == chapterState.chapter.index)
+                chapter.copyWith(downloadState: downloadState)
+              else
+                chapter
+          ])
+        else
+          volume
     ];
   }
 }

@@ -1,23 +1,24 @@
-import 'package:chapturn_browser_extension/utils/services/download/list.dart';
-import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
+import 'package:chapturn_browser_extension/core/novel/controllers/packaging_controller.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mutex/mutex.dart';
 
-import '../../utils/services/chapter/models.dart';
+import 'models.dart';
 import '../../utils/services/providers.dart';
 import '../../utils/shared/option.dart';
-import 'notifiers/chapter_list_notifier.dart';
-import 'notifiers/crawler_notifier.dart';
+import 'controllers/chapter_list_controller.dart';
+import 'controllers/crawler_controller.dart';
+import 'controllers/download_controller.dart';
 
-final crawlerNotifierProvider =
-    StateNotifierProvider<CrawlerNotifier, CrawlerState>(
-  (ref) => CrawlerNotifier(browser: ref.watch(browserServiceProvider)),
+final crawlerController =
+    StateNotifierProvider<CrawlerController, CrawlerState>(
+  (ref) => CrawlerController(browser: ref.watch(browserServiceProvider)),
 );
 
 /// should be overriden when data is received
 final crawlerDataProvider = Provider<Option<DataCrawlerState>>((ref) {
-  final crawlerState = ref.watch(crawlerNotifierProvider);
+  final crawlerState = ref.watch(crawlerController);
 
   if (crawlerState is DataCrawlerState) {
     return Option.data(crawlerState);
@@ -31,10 +32,10 @@ final crawlerInstanceProvider = Provider<Option<NovelCrawler>>(
 );
 
 final chapterListProvider =
-    StateNotifierProvider<ChapterList, List<VolumeState>>(
+    StateNotifierProvider<ChapterListController, List<VolumeState>>(
   (ref) => ref.watch(crawlerDataProvider).when(
-        none: () => ChapterList([]),
-        data: (data) => ChapterList(data.novel.volumes),
+        none: () => ChapterListController([]),
+        data: (data) => ChapterListController(data.novel.volumes),
       ),
 );
 
@@ -45,7 +46,7 @@ final chapterCountProvider = Provider<int>(
       ),
 );
 
-final selectedChaptersProvider = Provider<List<ChapterState>>(
+final pendingProvider = Provider<List<ChapterState>>(
   (ref) {
     return [
       for (var vs in ref.watch(chapterListProvider))
@@ -90,20 +91,70 @@ final singleVolumeProvider = Provider<List<ChapterState>>(
   },
 );
 
-final mixedDownloadStateProvider = Provider<DownloadState>((ref) {
-  final selectedChapters = ref.watch(selectedChaptersProvider);
-  final downloadState = ref.watch(downloadStateProvider);
+final taskMutexProvider = Provider<Mutex>((ref) => Mutex());
 
-  if (downloadState is Downloading) {
-    return downloadState;
-  }
+final downloadController =
+    StateNotifierProvider<DownloadController, DownloadControllerState>(
+  (ref) {
+    final controller = DownloadController(
+      ref.read,
+      ref.watch(crawlerInstanceProvider),
+      ref.watch(taskMutexProvider),
+    );
 
-  if (selectedChapters.isEmpty) {
-    return const DownloadState.complete();
-  } else {
-    return DownloadState.pending(selectedChapters);
-  }
+    ref.listen<List<ChapterState>>(
+      pendingProvider,
+      (_, pending) async {
+        controller.updatePending(pending);
+      },
+      fireImmediately: true,
+    );
+
+    return controller;
+  },
+);
+
+final downloadStateProvider = Provider<DownloadState>((ref) {
+  final controllerState = ref.watch(downloadController);
+  final pending = ref.watch(pendingProvider);
+
+  return controllerState.when(
+    idle: () {
+      if (pending.isEmpty) {
+        return const DownloadState.complete();
+      }
+
+      return DownloadState.pending(pending);
+    },
+    inProgress: () => DownloadState.downloading(pending.length),
+  );
 });
+
+final packagingController =
+    StateNotifierProvider<PackagingController, PackagingState>(
+  (ref) {
+    final controller = PackagingController(
+      ref.read,
+      ref.watch(crawlerDataProvider).whenData((data) => data.novel),
+      ref.watch(packagerProvider),
+      ref.watch(taskMutexProvider),
+    );
+
+    ref.listen<DownloadState>(
+      downloadStateProvider,
+      (_, state) => controller.updateDownloadState(state),
+      fireImmediately: true,
+    );
+
+    ref.listen<List<ChapterState>>(
+      pendingProvider,
+      (_, pending) => controller.updatePending(pending.isNotEmpty),
+      fireImmediately: true,
+    );
+
+    return controller;
+  },
+);
 
 /// should be overriden when building chapter list
 final chapterProvider =

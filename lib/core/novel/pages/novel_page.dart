@@ -1,9 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:chapturn_browser_extension/core/novel/notifiers/chapter_list_notifier.dart';
-import 'package:chapturn_browser_extension/core/novel/notifiers/crawler_notifier.dart';
+import 'package:chapturn_browser_extension/core/novel/controllers/chapter_list_controller.dart';
 import 'package:chapturn_browser_extension/core/novel/providers.dart';
-import 'package:chapturn_browser_extension/utils/services/download/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -23,22 +21,7 @@ class NovelPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final crawlerState = ref.watch(crawlerNotifierProvider);
-    ref.listen<List<VolumeState>>(chapterListProvider, (previous, next) {
-      if (next.isEmpty || !(previous != null && previous.isEmpty)) {
-        return;
-      }
-
-      ref.watch(crawlerDataProvider).whenData((data) {
-        // Populate download list
-        ref.read(downloadListController.notifier)
-          ..clear(update: false)
-          ..addAll(
-            data.crawler,
-            [for (var v in next) ...v.chapters],
-          );
-      });
-    });
+    final crawlerState = ref.watch(crawlerController);
 
     return crawlerState.map(
       loading: (state) => ModalCard.forceCentered(child: const LoadingCard()),

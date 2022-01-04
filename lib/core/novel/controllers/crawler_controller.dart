@@ -21,6 +21,11 @@ class CrawlerState with _$CrawlerState {
     Novel novel,
   ) = DataCrawlerState;
 
+  const factory CrawlerState.supported(
+    String url,
+    Meta meta,
+  ) = SupportedCrawlerState;
+
   const factory CrawlerState.unsupported(
     String url, [
     Meta? meta,
@@ -32,13 +37,11 @@ class CrawlerState with _$CrawlerState {
 class CrawlerController extends StateNotifier<CrawlerState> {
   CrawlerController({
     required this.browser,
-  }) : super(const CrawlerState.loading()) {
-    load();
-  }
+  }) : super(const CrawlerState.loading());
 
   final BrowserService browser;
 
-  Future<void> load() async {
+  Future<void> load({bool fetch = true}) async {
     String url = await browser.href;
     var item = crawlerByUrl(url);
     if (item == null) {
@@ -52,15 +55,17 @@ class CrawlerController extends StateNotifier<CrawlerState> {
       return;
     }
 
-    state = CrawlerState.fetching(url, meta);
+    if (fetch) {
+      state = CrawlerState.fetching(url, meta);
 
-    final crawler = item.create();
-    final novel = await crawler.parseNovel(url);
+      final crawler = item.create();
+      final novel = await crawler.parseNovel(url);
 
-    state = CrawlerState.data(meta, crawler, novel);
+      state = CrawlerState.data(meta, crawler, novel);
+    } else {
+      state = CrawlerState.supported(url, meta);
+    }
   }
-
-  Future<void> loadNovel() async {}
 
   Future<void> reload() async {
     if (state is! DataCrawlerState) {

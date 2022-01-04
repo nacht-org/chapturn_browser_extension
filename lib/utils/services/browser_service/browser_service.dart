@@ -28,7 +28,7 @@ class BrowserServiceProd implements BrowserService {
 
 class BrowserServiceDev implements BrowserService {
   @override
-  BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.tab;
+  BrowserRuntimeMode get runtimeMode => BrowserRuntimeMode.popup;
 
   @override
   Future<String> get href async =>

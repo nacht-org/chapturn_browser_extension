@@ -65,19 +65,22 @@ class PackagingController extends StateNotifier<PackagingState> {
       await taskMutex.protect(() async {});
     }
 
-    await novel.whenDataAsync((value) async {
-      state = const PackagingState.preparing();
-      Uint8List? thumbnail = await _thumbnail(value);
+    await novel.when(
+      none: () => throw Exception(),
+      data: (value) async {
+        state = const PackagingState.preparing();
+        Uint8List? thumbnail = await _thumbnail(value);
 
-      state = const PackagingState.busy();
-      final bytes = await _package(value, thumbnail);
+        state = const PackagingState.busy();
+        final bytes = await _package(value, thumbnail);
 
-      if (bytes != null) {
-        downloadFile(slugifyMinimal(value.title) + '.epub', bytes);
-      } else {
-        print('Failed to package: epub is null');
-      }
-    });
+        if (bytes != null) {
+          downloadFile(slugifyMinimal(value.title) + '.epub', bytes);
+        } else {
+          print('Failed to package: epub is null');
+        }
+      },
+    );
 
     if (!mounted) {
       return;

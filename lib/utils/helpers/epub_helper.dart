@@ -4,9 +4,9 @@ import 'package:epublib/epublib.dart' as epublib;
 extension NamespaceTo on Namespace {
   epublib.Namespace to() {
     switch (this) {
-      case Namespace.DC:
+      case Namespace.dc:
         return epublib.Namespace.dc;
-      case Namespace.OPF:
+      case Namespace.opf:
         return epublib.Namespace.dc;
     }
   }

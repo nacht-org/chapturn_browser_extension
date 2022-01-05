@@ -77,7 +77,7 @@ class DownloadController extends StateNotifier<DownloadControllerState> {
           item, const ChapterDownloadState.pending());
 
       try {
-        await crawler.whenAsync(
+        await crawler.when(
           none: () => throw Exception(),
           data: (value) async {
             await value.parseChapter(item.chapter);

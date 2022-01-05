@@ -22,23 +22,4 @@ class Option<T> with _$Option<T> {
       data: (data) => Option.data(callback(data)),
     );
   }
-
-  Future<Option<R>> whenDataAsync<R>(
-      Future<R> Function(T value) callback) async {
-    return whenAsync(
-      none: () async => const Option.none(),
-      data: (data) async => Option.data(await callback(data)),
-    );
-  }
-
-  Future<R> whenAsync<R>({
-    required Future<R> Function() none,
-    required Future<R> Function(T value) data,
-  }) async {
-    if (hasData) {
-      return await data((this as OptionData).data);
-    } else {
-      return await none();
-    }
-  }
 }

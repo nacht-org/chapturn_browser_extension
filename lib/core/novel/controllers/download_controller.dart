@@ -4,6 +4,7 @@ import 'package:chapturn_browser_extension/utils/shared/option.dart';
 import 'package:chapturn_sources/chapturn_sources.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart';
 import 'package:mutex/mutex.dart';
 
 import 'chapter_list_controller.dart';
@@ -52,57 +53,58 @@ class DownloadController extends StateNotifier<DownloadControllerState> {
     });
   }
 
-  Future<void> start() async {
+  Future<void> start({bool stopTask = false}) async {
     if (pending.isEmpty) {
       return;
     }
 
     state = const DownloadControllerState.inProgress();
-    await taskMutex.acquire();
+    read(taskRunningController.notifier).state = true;
 
-    while (true) {
-      final item = await pendingMutex.protect(() async {
-        if (pending.isEmpty) {
-          return null;
+    await taskMutex.protect(() async {
+      while (true) {
+        final item = await pendingMutex.protect(() async {
+          if (pending.isEmpty) {
+            return null;
+          }
+
+          return pending.firstWhereOrNull((element) => element.shouldDownload);
+        });
+
+        if (item == null) {
+          break;
         }
 
-        return pending.firstWhereOrNull((element) => element.shouldDownload);
-      });
-
-      if (item == null) {
-        break;
-      }
-
-      chapterListController.setDownloadState(
-          item, const ChapterDownloadState.pending());
-
-      try {
-        await crawler.when(
-          none: () => throw Exception(),
-          data: (value) async {
-            await value.parseChapter(item.chapter);
-          },
-        );
-
-        state = const DownloadControllerState.inProgress();
-      } catch (e) {
         chapterListController.setDownloadState(
-            item, ChapterDownloadState.error(e.toString()));
+            item, const ChapterDownloadState.pending());
 
-        continue;
+        try {
+          await crawler.when(
+            none: () => throw Exception(),
+            data: (value) async {
+              await value.parseChapter(item.chapter);
+            },
+          );
+
+          state = const DownloadControllerState.inProgress();
+        } catch (e) {
+          chapterListController.setDownloadState(
+              item, ChapterDownloadState.error(e.toString()));
+
+          continue;
+        }
+
+        chapterListController.setDownloadState(
+            item, const ChapterDownloadState.complete());
       }
+    });
 
-      chapterListController.setDownloadState(
-          item, const ChapterDownloadState.complete());
-    }
-
+    if (stopTask) read(taskRunningController.notifier).state = false;
     if (!mounted) {
-      taskMutex.release();
       return;
     }
 
     state = const DownloadControllerState.idle();
-    taskMutex.release();
   }
 
   ChapterListController get chapterListController =>

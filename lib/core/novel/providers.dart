@@ -92,6 +92,8 @@ final singleVolumeProvider = Provider<List<ChapterState>>(
 
 final taskMutexProvider = Provider<Mutex>((ref) => Mutex());
 
+final taskRunningController = StateProvider<bool>((ref) => false);
+
 final downloadController =
     StateNotifierProvider<DownloadController, DownloadControllerState>(
   (ref) {

@@ -56,8 +56,10 @@ class PackagingController extends StateNotifier<PackagingState> {
 
   Future<void> package() async {
     if (hasPending) {
-      read(downloadController.notifier).start();
+      read(downloadController.notifier).start(stopTask: false);
     }
+
+    read(taskRunningController.notifier).state = true;
 
     // Check and wait until download task is completed
     if (taskMutex.isLocked) {
@@ -81,6 +83,8 @@ class PackagingController extends StateNotifier<PackagingState> {
         }
       },
     );
+
+    read(taskRunningController.notifier).state = false;
 
     if (!mounted) {
       return;

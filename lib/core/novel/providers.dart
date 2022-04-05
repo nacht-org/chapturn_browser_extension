@@ -26,7 +26,7 @@ final crawlerDataProvider = Provider<Option<DataCrawlerState>>((ref) {
   }
 });
 
-final crawlerInstanceProvider = Provider<Option<NovelCrawler>>(
+final crawlerInstanceProvider = Provider<Option<Crawler>>(
   (ref) => ref.watch(crawlerDataProvider).whenData((data) => data.crawler),
 );
 

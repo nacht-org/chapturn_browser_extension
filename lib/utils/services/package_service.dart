@@ -1,6 +1,6 @@
 import 'dart:convert' as convert;
 
-import 'package:chapturn_sources/chapturn_Sources.dart' hide Namespace;
+import 'package:chapturn_sources/chapturn_sources.dart' hide Namespace;
 import 'package:path/path.dart' as path;
 import 'package:epublib/epublib.dart';
 import '../helpers/epub_helper.dart';

@@ -44,7 +44,7 @@ class DownloadController extends StateNotifier<DownloadControllerState> {
   final Mutex pendingMutex = Mutex();
 
   final Reader read;
-  final Option<NovelCrawler> crawler;
+  final Option<Crawler> crawler;
   final Mutex taskMutex;
 
   Future<void> updatePending(List<ChapterState> newPending) async {
@@ -82,7 +82,7 @@ class DownloadController extends StateNotifier<DownloadControllerState> {
           await crawler.when(
             none: () => throw Exception(),
             data: (value) async {
-              await value.parseChapter(item.chapter);
+              await (value as NovelParse).parseChapter(item.chapter);
             },
           );
 

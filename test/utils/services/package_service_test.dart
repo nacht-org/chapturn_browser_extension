@@ -21,7 +21,7 @@ void main() {
       const url =
           'https://www.scribblehub.com/series/180910/the-immortal-witchs-death-wish/';
 
-      var tuple = crawlerByUrl(url);
+      var tuple = getCrawlerFactoryWithUrl(url);
       if (tuple == null) {
         return;
       }
@@ -29,7 +29,13 @@ void main() {
       final meta = tuple.meta();
       final crawler = tuple.create();
 
-      final novel = await crawler.parseNovel(url);
+      if (crawler is! NovelParse) {
+        return;
+      }
+
+      final parser = crawler as NovelParse;
+
+      final novel = await parser.parseNovel(url);
       novel.volumes.add(Volume(
           index: 1,
           name: 'Another',

@@ -43,7 +43,7 @@ class CrawlerController extends StateNotifier<CrawlerState> {
 
   Future<void> load({bool fetch = true}) async {
     String url = await browser.href;
-    var item = getCrawlerFactoryWithUrl(url);
+    var item = crawlerFactoryFor(url);
     if (item == null) {
       state = CrawlerState.unsupported(url);
       return;

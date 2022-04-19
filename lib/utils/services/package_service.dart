@@ -38,11 +38,11 @@ class EpubPackager implements Packager {
       );
     }
 
-    if (novel.status != null) {
+    if (novel.status != NovelStatus.unknown) {
       book.addMetaData(
         namespace: Namespace.dc,
         name: 'status',
-        value: novel.status!,
+        value: novel.status.name,
       );
     }
 
